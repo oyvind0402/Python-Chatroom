@@ -41,9 +41,12 @@ def abort_if_room_exists(room_id):
 
 
 class User(Resource):
-    def get(self, user_id):
-        abort_if_user_not_exists(user_id)
-        return users[user_id], 200
+    def get(self, user_id=None):
+        if user_id is None:
+            return users, 200
+        else:
+            abort_if_user_not_exists(user_id)
+            return users[user_id], 200
 
     def post(self, user_id):
         abort_if_user_exists(user_id)
@@ -57,15 +60,13 @@ class User(Resource):
         return '', 204
 
 
-class Users(Resource):
-    def get(self):
-        return users, 200
-
-
 class Room(Resource):
-    def get(self, room_id):
-        abort_if_room_not_exists(room_id)
-        return rooms[room_id], 200
+    def get(self, room_id=None):
+        if room_id is None:
+            return rooms, 200
+        else:
+            abort_if_room_not_exists(room_id)
+            return rooms[room_id], 200
 
     def post(self, room_id):
         abort_if_room_exists(room_id)
@@ -91,9 +92,8 @@ class RoomUser(Resource):
     #     return
 
 
-api.add_resource(User, "/api/user/<int:user_id>")
-api.add_resource(Users, "/api/users")
-api.add_resource(Room, "/api/rooms", "/api/room/<int:room_id>")
+api.add_resource(User, "/api/user/<int:user_id>", "/api/users")
+api.add_resource(Room, "/api/rooms", "/api/room/<int:room_id>", "/api/rooms")
 api.add_resource(RoomUser, "/api/room/<int:room_id>/users")
 #api.add_resource(Message, "/api/room/<int:room_id>/messages")
 #api.add_resource(Message, "/api/room/<int:room_id>/<int:user_id>/messages")
@@ -102,10 +102,6 @@ api.add_resource(RoomUser, "/api/room/<int:room_id>/users")
 @app.route('/')
 def index():
     return "SHITTY OBLIG 2"
-
-@app.route('/api/rooms')
-def get_rooms():
-    return rooms
 
 
 if __name__ == "__main__":
