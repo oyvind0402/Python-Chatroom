@@ -57,13 +57,18 @@ class User(Resource):
         return '', 204
 
 
+class Users(Resource):
+    def get(self):
+        return users, 200
+
+
 class Room(Resource):
     def get(self, room_id):
         abort_if_room_not_exists(room_id)
         return rooms[room_id], 200
 
     def post(self, room_id):
-        about_if_room_exists(room_id)
+        abort_if_room_exists(room_id)
         args = room_post_args.parse_args()
         rooms[room_id] = args
         return rooms[room_id], 201
@@ -87,6 +92,7 @@ class RoomUser(Resource):
 
 
 api.add_resource(User, "/api/user/<int:user_id>")
+api.add_resource(Users, "/api/users")
 api.add_resource(Room, "/api/rooms", "/api/room/<int:room_id>")
 api.add_resource(RoomUser, "/api/room/<int:room_id>/users")
 #api.add_resource(Message, "/api/room/<int:room_id>/messages")
@@ -96,10 +102,6 @@ api.add_resource(RoomUser, "/api/room/<int:room_id>/users")
 @app.route('/')
 def index():
     return "SHITTY OBLIG 2"
-
-@app.route('/api/users')
-def get_users():
-    return users
 
 @app.route('/api/rooms')
 def get_rooms():

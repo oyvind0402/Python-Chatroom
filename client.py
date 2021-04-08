@@ -23,6 +23,11 @@ response = requests.get(BASE + "user/1")
 print(response.json())
 
 print("-------------------------------------------------------")
+print("RESULT FROM GET")
+response = requests.get(BASE + "users")
+print(response.json())
+
+print("-------------------------------------------------------")
 print("RESULT FROM POST")
 response = requests.post(BASE + "room/0", {"roomname": "ObligWork"})
 print(response.json())
