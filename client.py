@@ -23,32 +23,11 @@ response = requests.get(BASE + "user/1")
 print(response.json())
 
 print("-------------------------------------------------------")
-print("RESULT FROM GET")
-response = requests.get(BASE + "user")
-print(response.json())
-
-print("-------------------------------------------------------")
 print("RESULT FROM POST")
-response = requests.post(BASE + "room/0", {"roomname": "ObligWork", "room_users": {"user_id": 0, "username": "user"}})
+response = requests.post(BASE + "room/0", {"roomname": "ObligWork"})
 print(response.json())
 
 print("-------------------------------------------------------")
 print("RESULT FROM GET")
 response = requests.get(BASE + "room/0")
 print(response.json())
-
-print("-------------------------------------------------------")
-print("RESULT FROM GET")
-response = requests.get(BASE + "room/0/users")
-print(response.json())
-
-print("-------------------------------------------------------")
-print("RESULT FROM POST")
-response = requests.post(BASE + "room/0/users", {"user_id", 0})
-print(response.json())
-
-print("-------------------------------------------------------")
-print("RESULT FROM GET")
-response = requests.get(BASE + "room/0/users")
-print(response.json())
-

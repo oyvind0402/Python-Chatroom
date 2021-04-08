@@ -21,25 +21,49 @@ rooms = {}
 messages = {}
 
 
+def abort_if_user_not_exists(user_id):
+    if user_id not in users:
+        abort(404, message="Could not find user...")
+
+def abort_if_user_exists(user_id):
+    if user_id in users:
+        abort(409, message="User already exists with that ID...")
+
+def abort_if_room_not_exists(room_id):
+    if room_id not in rooms:
+        abort(404, message="Could not find room...")
+
+def abort_if_room_exists(room_id):
+    if room_id in rooms:
+        abort(409, message="Room already exists with that ID...")
+
+
+
+
 class User(Resource):
     def get(self, user_id):
+        abort_if_user_not_exists(user_id)
         return users[user_id], 200
 
     def post(self, user_id):
+        abort_if_user_exists(user_id)
         args = user_post_args.parse_args()
         users[user_id] = args
         return users[user_id], 201
         
     def delete(self, user_id):
+        abort_if_user_not_exists(user_id)
         del users[user_id]
         return '', 204
 
 
 class Room(Resource):
     def get(self, room_id):
+        abort_if_room_not_exists(room_id)
         return rooms[room_id], 200
 
     def post(self, room_id):
+        about_if_room_exists(room_id)
         args = room_post_args.parse_args()
         rooms[room_id] = args
         return rooms[room_id], 201
