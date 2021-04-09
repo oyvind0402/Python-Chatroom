@@ -12,7 +12,7 @@ room_post_args = reqparse.RequestParser()
 room_post_args.add_argument("roomname", type=str, help="Roomname is required...", required=True)
 
 room_user_post_args = reqparse.RequestParser()
-room_user_post_args.add_argument("user_id", type=int, action="append")
+room_user_post_args.add_argument("user_id", type=int, action="append", required=True)
 
 message_post_args = reqparse.RequestParser()
 message_post_args.add_argument("message", type=str, help="Message is required...", required=True)
@@ -79,11 +79,14 @@ class Room(Resource):
 class RoomUser(Resource):
     def get(self, room_id):
         abort_if_room_not_exists(room_id)
+        if not roomusers:
+            abort(404, message="No users in any rooms...")
         message = "Users in room number " + str(room_id) + ":"
         for id in roomusers[room_id]["user_id"]:
             message += " "
             message += str(id)
         return message, 200
+        
     def post(self, room_id):
         abort_if_room_not_exists(room_id)
         args = room_user_post_args.parse_args()
@@ -91,7 +94,6 @@ class RoomUser(Resource):
             roomusers[room_id] = args
         else:
             roomusers[room_id]["user_id"].append(args["user_id"][0])
-
         return args, 201
 
 
