@@ -52,6 +52,20 @@ print("RESULT FROM GET ALL ROOMS")
 response = requests.get(BASE + "rooms")
 print(response.json())
 
+print("-------------------------------------------------------")
+print("RESULT FROM POST A ROOMUSER")
+response = requests.post(BASE + "room/0/users", {"user_id": 2})
+print(response.json())
+
+print("-------------------------------------------------------")
+print("RESULT FROM POST A ROOMUSER")
+response = requests.post(BASE + "room/0/users", {"user_id": 3})
+print(response.json())
+
+print("-------------------------------------------------------")
+print("RESULT FROM GET ROOMUSERS")
+response = requests.get(BASE + "room/0/users")
+print(response.json())
 
 print("-------------------------------------------------------")
 print("RESULT FROM POST A ROOMUSER")
