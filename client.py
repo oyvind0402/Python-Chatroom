@@ -22,18 +22,20 @@ print("RESULT FROM GET ALL USERS")
 response = requests.get(BASE + "users")
 print(response.json())
 
-sys.exit()
 # ALT SOM STÅR UNDER MÅ BARE INGONERES ;)
 
-print("Welcome ", n, " your user has been created. Please join a room to chat by typing ...")
+print("Welcome ", n, " your user has been created.")
 
 print()
-response = requests.get(BASE + "room/0")
+print(BASE + "rooms/")
+response = requests.get(BASE + "rooms")
 print(response.json())
 
-print("Do you want to join one of the following rooms? [y/n]")
-
-will_join = input()
+if response.json() == []:
+    will_join = "n"
+else:
+    print("Do you want to join one of the following rooms? [y/n]")
+    will_join = input()
 
 if will_join == "y":
     print("good")
@@ -41,9 +43,10 @@ else:
     print("No is selected. Do you wish to create a room [y/n]")
     create_room = input()
     if create_room == "y":
-        print("Good a room will be created for you")
-        response = requests.post(BASE + "room/1", {"roomname": "PortfolioWork"})
-        print(response.json())
+        print("Good what do you want to call your room?")
+        name = input()
+        response = requests.post(BASE + "room/" + name)
+        print(response.json() + " is created")
     else:
         print("That is to bad too hear. If you don't want to join or create a room. The program will be closed.")
         print("Feel free to try again")
