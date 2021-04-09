@@ -17,12 +17,19 @@ room_user_post_args.add_argument("user_id", type=int, action="append", required=
 message_post_args = reqparse.RequestParser()
 message_post_args.add_argument("message", type=str, help="Message is required...", required=True)
 
+rooms = [
+    {string, array, array},
+    {room_name, user_list, message},
+    {room_name, user_list, message},
+    {room_name, user_list, message},
+    {room_name, user_list, message},
+    {room_name, user_list, message},
+]
 
 users = {}
 rooms = {}
 roomusers = {}
 messages = {}
-
 
 def abort_if_user_not_exists(user_id):
     if user_id not in users:
@@ -106,7 +113,7 @@ class Message(Resource):
 
 
 api.add_resource(User, "/api/user/<int:user_id>", "/api/users")
-api.add_resource(Room, "/api/rooms", "/api/room/<int:room_id>", "/api/rooms")
+api.add_resource(Room, "/api/room/<int:room_id>", "/api/rooms")
 api.add_resource(RoomUser, "/api/room/<int:room_id>/users")
 #api.add_resource(Message, "/api/room/<int:room_id>/messages", "/api/room/<int:room_id>/<int:user_id>/messages")
 
