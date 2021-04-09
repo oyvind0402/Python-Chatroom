@@ -6,7 +6,7 @@ api = Api(app)
 
 user_post_args = reqparse.RequestParser()
 user_post_args.add_argument("username", type=str, help="Username is required...", required=True)
-user_post_args.add_argument("usertype", type=str, help="Invalid syntax for usertype...", required=False)
+#user_post_args.add_argument("usertype", type=str, help="Invalid syntax for usertype...", required=False)
 
 room_post_args = reqparse.RequestParser()
 room_post_args.add_argument("room_id", type=int, help="Roomname is required...", required=True)
@@ -19,10 +19,10 @@ message_post_args.add_argument("message", type=str, help="Message is required...
 
 users = []
 rooms = []
-roomusers = {}
+roomusers = []
 messages = {}
 
-#Append users
+# Append users
 # rooms[2]["userlist"].append()
 # get and put methods for room_user class resource
 # check if user exists in the userlist or abort
@@ -46,6 +46,9 @@ def abort_if_room_exists(room_id):
     for room in rooms:
         if room_id == room["roomid"]:
             abort(409, message="Room already exists with that ID...")
+
+def abort_if_roomuser_not_exists(room_id):
+    abort(404, message=f"Could not find any users for room {room_id}...")
 
 
 class User(Resource):
@@ -88,22 +91,43 @@ class Room(Resource):
 
 class RoomUser(Resource):
     def get(self, room_id):
-        abort_if_room_not_exists(room_id)
-        if not roomusers:
-            abort(404, message="No users in any rooms...")
-        message = "Users in room number " + str(room_id) + ":"
-        for id in roomusers[room_id]["username"]:
-            message += " "
-            message += str(id)
-        return message, 200
+        #If no specified ID, all rooms' users
+        if room_id is None:
+            #Checks if there are any populated rooms
+            if len(roomusers) == 0:
+                abort(404, message="No users in any rooms...")
+            return roomusers, 200
+        
+        #If specified ID
+        else:
+            #Checks if room exists
+            room_exists = False
+            for room in rooms:
+                if room_id == room["roomid"]:
+                    room_exists = True
+            if room_exists == False:
+                abort_if_room_not_exists(room_id)
+
+            #If room exists, return users
+            #{1 : {users : []}}
+            if room_id in roomusers:
+                message = "Users in room number " + str(room_id) + ":"
+                for user in roomusers[room_id]:
+                    message += user + ", "
+                return message[:-2], 200
+            abort_if_roomuser_not_exists(room_id)
         
     def post(self, room_id):
-        abort_if_room_not_exists(room_id)
+        #{1 : { users: []}}
+        #Checks if room exists
+        if room_id not in rooms:
+            abort_if_room_not_exists(room_id)
+
         args = room_user_post_args.parse_args()
         if room_id not in roomusers:
-            roomusers[room_id] = args
+            roomusers[room_id]["users"] = [args["username"][0]]
         else:
-            roomusers[room_id]["username"].append(args["username"][0])
+            roomusers[room_id]["users"].append(args["username"][0])
         return args, 201
 
 
@@ -117,7 +141,7 @@ class Message(Resource):
 
 api.add_resource(User, "/api/user/<string:username>", "/api/users")
 api.add_resource(Room, "/api/room/<int:room_id>", "/api/rooms")
-api.add_resource(RoomUser, "/api/room/<int:room_id>/users")
+api.add_resource(RoomUser, "/api/room/<int:room_id>/users", "/api/rooms/users")
 #api.add_resource(Message, "/api/room/<int:room_id>/messages", "/api/room/<int:room_id>/<str:username>/messages")
 
 
