@@ -81,7 +81,7 @@ class RoomUser(Resource):
         abort_if_room_not_exists(room_id)
         message = "Users in room number " + str(room_id) + ":"
         for id in roomusers[room_id]["user_id"]:
-            message += " "
+            message += ", "
             message += str(id)
         return message, 200
     def post(self, room_id):
