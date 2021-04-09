@@ -12,27 +12,35 @@ room_post_args = reqparse.RequestParser()
 room_post_args.add_argument("room_id", type=int, help="Roomname is required...", required=True)
 
 room_user_post_args = reqparse.RequestParser()
-room_user_post_args.add_argument("user_id", type=int, action="append", required=True)
+room_user_post_args.add_argument("user_name", type=str, action="append", required=True)
 
 message_post_args = reqparse.RequestParser()
 message_post_args.add_argument("message", type=str, help="Message is required...", required=True)
 
-users = {}
+users = []
 rooms = []
 roomusers = {}
 messages = {}
 
-def abort_if_user_not_exists(user_id):
-    if user_id not in users:
+#Append users
+# rooms[2]["userlist"].append()
+# get and put methods for room_user class resource
+# check if user exists in the userlist or abort
+
+# Append messages
+
+#Create post args for messages
+
+def abort_if_user_not_exists(username):
+    if username not in users:
         abort(404, message="Could not find user...")
 
-def abort_if_user_exists(user_id):
-    if user_id in users:
+def abort_if_user_exists(username):
+    if username in users:
         abort(409, message="User already exists with that ID...")
 
 def abort_if_room_not_exists(room_id):
-    if room_id not in rooms:
-        abort(404, message="Could not find room...")
+    abort(404, message="Could not find room...")
 
 def abort_if_room_exists(room_id):
     for room in rooms:
@@ -41,22 +49,23 @@ def abort_if_room_exists(room_id):
 
 
 class User(Resource):
-    def get(self, user_id=None):
-        if user_id is None:
+    def get(self, username=None):
+        if username is None:
             return users, 200
         else:
-            abort_if_user_not_exists(user_id)
-            return users[user_id], 200
+            abort_if_user_not_exists(username)
+            for user in users:
+                if user == username:
+                    return user, 200
 
-    def post(self, user_id):
-        abort_if_user_exists(user_id)
-        args = user_post_args.parse_args()
-        users[user_id] = args
-        return users[user_id], 201
+    def post(self, username):
+        abort_if_user_exists(username)
+        users.append(username)
+        return username, 201
         
-    def delete(self, user_id):
-        abort_if_user_not_exists(user_id)
-        del users[user_id]
+    def delete(self, username):
+        abort_if_user_not_exists(username)
+        users.remove(username)
         return '', 204
 
 
@@ -65,8 +74,10 @@ class Room(Resource):
         if room_id is None:
             return rooms, 200
         else:
+            for room in rooms:
+                if room_id == room["roomid"]:
+                    return room, 200
             abort_if_room_not_exists(room_id)
-            return rooms[room_id], 200
 
     def post(self, room_id):
         abort_if_room_exists(room_id)
@@ -81,7 +92,7 @@ class RoomUser(Resource):
         if not roomusers:
             abort(404, message="No users in any rooms...")
         message = "Users in room number " + str(room_id) + ":"
-        for id in roomusers[room_id]["user_id"]:
+        for id in roomusers[room_id]["username"]:
             message += " "
             message += str(id)
         return message, 200
@@ -92,7 +103,7 @@ class RoomUser(Resource):
         if room_id not in roomusers:
             roomusers[room_id] = args
         else:
-            roomusers[room_id]["user_id"].append(args["user_id"][0])
+            roomusers[room_id]["username"].append(args["username"][0])
         return args, 201
 
 
@@ -100,14 +111,14 @@ class Message(Resource):
     def get(self, room_id):
         return
 
-    def post(self, room_id, user_id):
+    def post(self, room_id, username):
         return
 
 
-api.add_resource(User, "/api/user/<int:user_id>", "/api/users")
+api.add_resource(User, "/api/user/<string:username>", "/api/users")
 api.add_resource(Room, "/api/room/<int:room_id>", "/api/rooms")
 api.add_resource(RoomUser, "/api/room/<int:room_id>/users")
-#api.add_resource(Message, "/api/room/<int:room_id>/messages", "/api/room/<int:room_id>/<int:user_id>/messages")
+#api.add_resource(Message, "/api/room/<int:room_id>/messages", "/api/room/<int:room_id>/<str:username>/messages")
 
 
 @app.route('/')
