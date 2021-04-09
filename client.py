@@ -1,7 +1,35 @@
+import json
 import random
 import sys
 
 import requests
+from flask import jsonify
+
+rooms = [
+    {"roomid": "a room",
+     "userlist": ["user1", "user2", "user3"],
+     "message_list": ["user1: hello", "user2: hello"]
+     },
+    {"roomid": 1,
+     "userlist": ["user1", "user2", "user3"],
+     "message_list": ["user1: hello", "user2: hello"]},
+]
+
+
+id = 2
+userList = []
+message_list = []
+room = {"roomid" : id, "userlist": [], "message_list": []}
+rooms.append(room)
+print(json.dumps(rooms))
+
+rooms[0]["userlist"].append("user4")
+
+print(rooms[2]["userlist"])
+sys.exit()
+
+print(json.dumps(rooms))
+sys.exit()
 
 BASE = "http://127.0.0.1:5000/api/"
 
@@ -11,12 +39,12 @@ picked_chatbot = random.choice(chatbots)
 # just so we can make a lot of users
 n = random.randint(0, 5000)
 
-#post_user = BASE + "user/", {"username": str(n)}
-#print(post_user)
+# post_user = BASE + "user/", {"username": str(n)}
+# print(post_user)
 print("User picked " + str(n))
 response = requests.post(BASE + "user/" + str(n))
 print(response.json())
-#Legge til feilhåndtering dersom userid allerede finnes
+# Legge til feilhåndtering dersom userid allerede finnes
 
 print("RESULT FROM GET ALL USERS")
 response = requests.get(BASE + "users")

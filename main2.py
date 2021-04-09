@@ -9,7 +9,7 @@ user_post_args.add_argument("username", type=str, help="Username is required..."
 user_post_args.add_argument("usertype", type=str, help="Invalid syntax for usertype...", required=False)
 
 room_post_args = reqparse.RequestParser()
-room_post_args.add_argument("roomname", type=str, help="Roomname is required...", required=True)
+room_post_args.add_argument("room_id", type=int, help="Roomname is required...", required=True)
 
 room_user_post_args = reqparse.RequestParser()
 room_user_post_args.add_argument("user_id", type=int, action="append", required=True)
@@ -17,17 +17,8 @@ room_user_post_args.add_argument("user_id", type=int, action="append", required=
 message_post_args = reqparse.RequestParser()
 message_post_args.add_argument("message", type=str, help="Message is required...", required=True)
 
-rooms = [
-    {string, array, array},
-    {room_name, user_list, message},
-    {room_name, user_list, message},
-    {room_name, user_list, message},
-    {room_name, user_list, message},
-    {room_name, user_list, message},
-]
-
 users = {}
-rooms = {}
+rooms = []
 roomusers = {}
 messages = {}
 
@@ -44,8 +35,9 @@ def abort_if_room_not_exists(room_id):
         abort(404, message="Could not find room...")
 
 def abort_if_room_exists(room_id):
-    if room_id in rooms:
-        abort(409, message="Room already exists with that ID...")
+    for room in rooms:
+        if room_id == room["roomid"]:
+            abort(409, message="Room already exists with that ID...")
 
 
 class User(Resource):
@@ -78,9 +70,9 @@ class Room(Resource):
 
     def post(self, room_id):
         abort_if_room_exists(room_id)
-        args = room_post_args.parse_args()
-        rooms[room_id] = args
-        return rooms[room_id], 201
+        room = {"roomid" : room_id, "userlist": [], "message_list": []}
+        rooms.append(room)
+        return room_id, 201
 
 
 class RoomUser(Resource):

@@ -29,17 +29,17 @@ print(response.json())
 
 print("-------------------------------------------------------")
 print("RESULT FROM POST A ROOM")
-response = requests.post(BASE + "room/0", {"roomname": "ObligWork"})
+response = requests.post(BASE + "room/0")
 print(response.json())
 
 print("-------------------------------------------------------")
 print("RESULT FROM POST THE SAME ROOM_ID")
-response = requests.post(BASE + "room/0", {"roomname": "ObligWork"})
+response = requests.post(BASE + "room/1")
 print(response.json())
 
 print("-------------------------------------------------------")
 print("RESULT FROM POST A ROOM")
-response = requests.post(BASE + "room/1", {"roomname": "PortfolioWork"})
+response = requests.post(BASE + "room/2")
 print(response.json())
 
 print("-------------------------------------------------------")
