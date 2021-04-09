@@ -18,7 +18,6 @@ room_put_args = reqparse.RequestParser()
 room_put_args.add_argument("roomid", type=str, help="Roomname is required...", required=True)
 room_put_args.add_argument("user_id", type=str, help="User ID is required...", required=True)
 
-
 # room_user_post_args = reqparse.RequestParser()
 # room_user_post_args.add_argument("user_id", type=str, help="User id is required...", required=True)
 # room_user_post_args.add_argument("username", type=str, help="Username is required...", required=True)
@@ -75,6 +74,8 @@ class User(Resource):
 
 
 class Room(Resource):
+    user_list = []
+
     def get(self, room_name):
         if room_name is None:
             return 404
@@ -88,17 +89,19 @@ class Room(Resource):
         # abort_if_room_exists(room_id)
         # args = room_post_args.parse_args()
         # rooms[room_id] = args
+
         return room_name, 201
 
     def put(self, room_name, user_id):
         args = room_post_args.parse_args()
 
-
-
+    def adduser(self, username):
+        user_list.append
 
 class Rooms(Resource):
     def get(self):
         return rooms, 200
+
 
 """""
 class RoomUser(Resource):
@@ -122,6 +125,8 @@ class RoomUser(Resource):
 api.add_resource(User, "/api/user/<string:user_id>", "/api/users")
 api.add_resource(Room, "/api/room/<string:room_name>")
 api.add_resource(Rooms, "/api/rooms")
+
+
 # api.add_resource(RoomUser, "/api/room/<int:room_id>/users")
 
 
