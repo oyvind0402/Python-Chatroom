@@ -22,10 +22,10 @@ message_list = []
 room = {"roomid" : id, "userlist": [], "message_list": []}
 rooms.append(room)
 print(json.dumps(rooms))
+print(rooms[0]["userlist"])
 
 rooms[0]["userlist"].append("user4")
 
-print(rooms[2]["userlist"])
 sys.exit()
 
 print(json.dumps(rooms))

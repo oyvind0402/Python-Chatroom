@@ -33,7 +33,7 @@ response = requests.post(BASE + "room/0")
 print(response.json())
 
 print("-------------------------------------------------------")
-print("RESULT FROM POST THE SAME ROOM_ID")
+print("RESULT FROM POST a ROOM_ID")
 response = requests.post(BASE + "room/1")
 print(response.json())
 
@@ -53,9 +53,29 @@ response = requests.get(BASE + "rooms")
 print(response.json())
 
 print("-------------------------------------------------------")
-print("RESULT FROM POST A ROOMUSER")
-response = requests.post(BASE + "room/0", {"username": "oyvind91"})
+print("RESULT FROM put A ROOMUSER")
+response = requests.put(BASE + "room/0" + "/user/" + "oyvind91")
 print(response.json())
+
+print("-------------------------------------------------------")
+print("RESULT FROM put A ROOMUSER")
+response = requests.put(BASE + "room/0" + "/user/" + "oyvind91")
+print(response.json())
+
+print("-------------------------------------------------------")
+print("RESULT FROM put A ROOMUSER")
+response = requests.put(BASE + "room/0" + "/user/" + "someone")
+print(response.json())
+
+print("-------------------------------------------------------")
+print("RESULT FROM GET A ROOM")
+response = requests.get(BASE + "room/0")
+print(response.json())
+
+# print("-------------------------------------------------------")
+# print("RESULT FROM POST A ROOMUSER")
+# response = requests.post(BASE + "room/0" + "/oyvind91")
+# print(response.json())
 
 # print("-------------------------------------------------------")
 # print("RESULT FROM POST A ROOMUSER")
@@ -64,6 +84,11 @@ print(response.json())
 
 print("-------------------------------------------------------")
 print("RESULT FROM GET ROOMUSERS")
+response = requests.get(BASE + "room/0/user/someone")
+print(response.json())
+
+print("-------------------------------------------------------")
+print("RESULT FROM GET ALL ROOMUSERS")
 response = requests.get(BASE + "room/0/users")
 print(response.json())
 
