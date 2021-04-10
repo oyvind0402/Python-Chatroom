@@ -125,7 +125,7 @@ class RoomUser(Resource):
                     for user in room["userlist"]:
                         if user == username:
                             return username + " is in the room " + str(room_id), 201
-                    abort(404, message=f"User hasn't been found in room: {room_id}...")
+                    abort(404, message=f"User hasn't been found in room {room_id}...")
         abort(404, message=f"Couldnt find {room_id}...")
 
         # old code
@@ -169,6 +169,9 @@ class RoomUser(Resource):
     #     return args, 201
 
     def put(self, room_id, username):
+        if username not in users:
+            abort(404, message=f"Couldnt find user {username}...")
+
         for room in rooms:
             if room_id == room["roomid"]:
                 for username_room in room["userlist"]:
@@ -188,7 +191,7 @@ class Message(Resource):
                         if len(room["message_list"]) == 0:
                             return f"Room {room_id} has no messages.", 201
                         return room["message_list"], 201
-                abort(404, message=f"User hasn't been found in room: {room_id}...")
+                abort(404, message=f"User hasn't been found in room {room_id}...")
 
     def post(self, room_id, username):
         return

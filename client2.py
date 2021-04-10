@@ -2,142 +2,120 @@ import requests
 
 BASE = "http://127.0.0.1:5000/api/"
 
-print("-------------------------------------------------------")
-print("RESULT FROM POST A USER")
-response = requests.post(BASE + "user/oyvind91")
-print(response.json())
+def print_response(response):
+    try:
+        print(response.json())
+    except requests.exceptions.Timeout:
+        print("Request timed out")
+    except:
+        print("Invalid request.")
 
-print("-------------------------------------------------------")
-print("RESULT FROM POST A USER")
-response = requests.post(BASE + "user/someone")
-print(response.json())
+def add_user(username):
+    print("USER POST")
+    response = requests.post(BASE + "user/" + str(username))
+    print_response(response)
+    print("-------------------------------------------------------")
 
-print("-------------------------------------------------------")
-print("RESULT FROM GET A USER")
-response = requests.get(BASE + "user/oyvind91")
-print(response.json())
+def get_user(username=None):
+    if username==None or username=="":
+        print("USER GET ALL")
+        response = requests.get(BASE + "users")
+    else:
+        print("USER GET")
+        response = requests.get(BASE + "user/" + str(username))
+    print_response(response)
+    print("-------------------------------------------------------")
 
-print("-------------------------------------------------------")
-print("RESULT FROM GET A USER")
-response = requests.get(BASE + "user/someone")
-print(response.json())
+def add_room(id):
+    print("ROOM POST")
+    response = requests.post(BASE + "room/"+str(id))
+    print_response(response)
+    print("-------------------------------------------------------")
 
-print("-------------------------------------------------------")
-print("RESULT FROM GET ALL USERS")
-response = requests.get(BASE + "users")
-print(response.json())
+def get_room(id=None):
+    if id==None:
+        print("ROOM GET ALL")
+        response = requests.get(BASE + "rooms")
+    else:
+        print("ROOM GET")
+        response = requests.get(BASE + "room/"+str(id))
+    print_response(response)
+    print("-------------------------------------------------------")
 
-print("-------------------------------------------------------")
-print("RESULT FROM POST A ROOM")
-response = requests.post(BASE + "room/0")
-print(response.json())
+def add_roomuser(room_id, username):
+    print("ROOMUSER PUT")
+    response = requests.put(BASE + "room/" + str(room_id) + "/user/" + str(username))
+    print_response(response)
+    print("-------------------------------------------------------")
 
-print("-------------------------------------------------------")
-print("RESULT FROM POST a ROOM_ID")
-response = requests.post(BASE + "room/1")
-print(response.json())
+def get_roomuser(room_id, username=None):
+    if username==None:
+        print("ROOMUSER GET ALL")
+        response = requests.get(BASE + "room/"+str(room_id)+"/users")
+    else:
+        print("ROOMUSER GET")
+        response = requests.get(BASE + "room/"+str(room_id)+"/user/"+str(username))
+    print_response(response)
+    print("-------------------------------------------------------")
 
-print("-------------------------------------------------------")
-print("RESULT FROM POST A ROOM")
-response = requests.post(BASE + "room/2")
-print(response.json())
+def add_message(room_id, username, message):
+    print("MESSAGE PUT")
+    response = requests.put(BASE + "room/"+str(room_id)+"/user/"+str(username)+"/message/"+str(message))
+    print_response(response)
+    print("-------------------------------------------------------")
 
-print("-------------------------------------------------------")
-print("RESULT FROM GET A ROOM")
-response = requests.get(BASE + "room/0")
-print(response.json())
+def get_messages(room_id, username):
+    print("MESSAGE GET")
+    response = requests.get(BASE + "room/"+str(room_id)+"/user/"+str(username)+"/messages")
+    print_response(response)
+    print("-------------------------------------------------------")
 
-print("-------------------------------------------------------")
-print("RESULT FROM GET ALL ROOMS")
-response = requests.get(BASE + "rooms")
-print(response.json())
+print("--------------------------USER TESTS-----------------------------")
+add_user("oyvind91")
+add_user("someone")
 
-print("-------------------------------------------------------")
-print("RESULT FROM put A ROOMUSER")
-response = requests.put(BASE + "room/0" + "/user/" + "oyvind91")
-print(response.json())
+get_user("someone")
+get_user("not_member")
+get_user(1)
+get_user(True)
+get_user("      ")
+get_user("")
+get_user()
 
-print("-------------------------------------------------------")
-print("RESULT FROM put A ROOMUSER")
-response = requests.put(BASE + "room/0" + "/user/" + "oyvind91")
-print(response.json())
+print("--------------------------ROOM TESTS-----------------------------")
+add_room(0)
+add_room(1)
+add_room("error")
 
-print("-------------------------------------------------------")
-print("RESULT FROM put A ROOMUSER")
-response = requests.put(BASE + "room/0" + "/user/" + "someone")
-print(response.json())
+get_room(0)
+get_room(1)
+get_room(2)
+get_room("error")
+get_room()
 
-print("-------------------------------------------------------")
-print("RESULT FROM GET A ROOM")
-response = requests.get(BASE + "room/0")
-print(response.json())
+print("--------------------------ROOMUSER TESTS-----------------------------")
+add_roomuser(0, "oyvind91")
+add_roomuser("0", "oyvind91")
+add_roomuser(1, "oyvind91")
+add_roomuser("1", "error")
+add_roomuser(1, "")
+add_roomuser(2, "oyvind91")
+add_roomuser("error", "oyvind91")
 
-print("-------------------------------------------------------")
-print("RESULT FROM GET A ROOM")
-response = requests.get(BASE + "room/1")
-print(response.json())
+get_roomuser(0, "someone")
+get_roomuser(0)
+get_roomuser(1)
+get_roomuser("error")
+get_roomuser(1, "error")
+get_roomuser("error", "oyvind91")
 
-# print("-------------------------------------------------------")
-# print("RESULT FROM POST A ROOMUSER")
-# response = requests.post(BASE + "room/0" + "/oyvind91")
-# print(response.json())
+print("--------------------------MESSAGE TESTS-----------------------------")
+add_message(0, "oyvind91", "hey")
+add_message(0, "not_member", "hey")
+add_message("error", "oyvind91", "hey")
+add_message("error", "oyvind91", "")
 
-# print("-------------------------------------------------------")
-# print("RESULT FROM POST A ROOMUSER")
-# response = requests.post(BASE + "room/0", {"username": "someone"})
-# print(response.json())
-
-print("-------------------------------------------------------")
-print("RESULT FROM GET ROOMUSERS")
-response = requests.get(BASE + "room/0/user/someone")
-print(response.json())
-
-print("-------------------------------------------------------")
-print("RESULT FROM GET ALL ROOMUSERS")
-response = requests.get(BASE + "room/0/users")
-print(response.json())
-
-print("-------------------------------------------------------")
-print("RESULT FROM GET ROOMUSERS")
-response = requests.get(BASE + "room/1/users")
-print(response.json())
-
-# print("-------------------------------------------------------")
-# print("RESULT FROM POST A ROOMUSER")
-# response = requests.post(BASE + "room/1/users", {"user_id": 0})
-# print(response.json())
-
-# print("-------------------------------------------------------")
-# print("RESULT FROM POST A ROOMUSER")
-# response = requests.post(BASE + "room/1/users", {"user_id": 1})
-# print(response.json())
-
-#/api/room/<int:room_id>/user/<string:username>/message/<string:message>"
-print("-------------------------------------------------------")
-print("RESULT FROM PUT MESSAGE TO ROOM 0")
-response = requests.put(BASE + "room/0/user/someone/message/hey")
-print(response.json())
-
-print("-------------------------------------------------------")
-print("RESULT FROM PUT MESSAGE TO ROOM 1")
-response = requests.put(BASE + "room/1/user/oyvind91/message/hey")
-print(response.json())
-
-print("-------------------------------------------------------")
-print("RESULT FROM GET MESSAGES FROM OYVIND91 IN ROOM 0")
-response = requests.get(BASE + "room/0/user/oyvind91/messages")
-print(response.json())
-
-print("-------------------------------------------------------")
-print("RESULT FROM GET MESSAGES FROM NOT_MEMBER IN ROOM 0")
-response = requests.get(BASE + "room/0/user/not_member/messages")
-print(response.json())
-
-print("-------------------------------------------------------")
-print("RESULT FROM GET MESSAGES FROM NOT_MEMBER IN ROOM 1")
-response = requests.get(BASE + "room/1/user/not_member/messages")
-print(response.json())
-
-#"/api/room/<int:room_id>/messages"
-
-#Add more tests with possibility to fail
+get_messages(0, "oyvind91")
+get_messages(1, "oyvind91")
+get_messages(0, "error")
+get_messages("error", "error")
