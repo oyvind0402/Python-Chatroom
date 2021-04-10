@@ -28,7 +28,7 @@ def get_user(username=None):
 
 def add_room(id):
     print("ROOM POST")
-    response = requests.post(BASE + "room/"+str(id))
+    response = requests.put(BASE + "room/"+str(id))
     print_response(response)
     print("-------------------------------------------------------")
 
@@ -72,7 +72,9 @@ def get_messages(room_id, username):
 
 print("--------------------------USER TESTS-----------------------------")
 add_user("oyvind91")
+add_user("oyvind91")
 add_user("someone")
+add_user(10)
 
 get_user("someone")
 get_user("not_member")
@@ -85,6 +87,7 @@ get_user()
 print("--------------------------ROOM TESTS-----------------------------")
 add_room(0)
 add_room(1)
+add_room(1)
 add_room("error")
 
 get_room(0)
@@ -95,6 +98,7 @@ get_room()
 
 print("--------------------------ROOMUSER TESTS-----------------------------")
 add_roomuser(0, "oyvind91")
+add_roomuser(0, "someone")
 add_roomuser("0", "oyvind91")
 add_roomuser(1, "oyvind91")
 add_roomuser("1", "error")
@@ -102,7 +106,8 @@ add_roomuser(1, "")
 add_roomuser(2, "oyvind91")
 add_roomuser("error", "oyvind91")
 
-get_roomuser(0, "someone")
+get_roomuser(0, "oyvind91")
+get_roomuser(1, 10)
 get_roomuser(0)
 get_roomuser(1)
 get_roomuser("error")
