@@ -72,6 +72,11 @@ print("RESULT FROM GET A ROOM")
 response = requests.get(BASE + "room/0")
 print(response.json())
 
+print("-------------------------------------------------------")
+print("RESULT FROM GET A ROOM")
+response = requests.get(BASE + "room/1")
+print(response.json())
+
 # print("-------------------------------------------------------")
 # print("RESULT FROM POST A ROOMUSER")
 # response = requests.post(BASE + "room/0" + "/oyvind91")
@@ -120,13 +125,17 @@ print(response.json())
 
 print("-------------------------------------------------------")
 print("RESULT FROM GET MESSAGES FROM OYVIND91 IN ROOM 0")
-response = requests.get(BASE + "room/0/user/oyvind91")
+response = requests.get(BASE + "room/0/user/oyvind91/messages")
 print(response.json())
 
+print("-------------------------------------------------------")
+print("RESULT FROM GET MESSAGES FROM NOT_MEMBER IN ROOM 0")
+response = requests.get(BASE + "room/0/user/not_member/messages")
+print(response.json())
 
 print("-------------------------------------------------------")
-print("RESULT FROM GET MESSAGES FROM ROOM 0")
-response = requests.get(BASE + "room/0/messages")
+print("RESULT FROM GET MESSAGES FROM NOT_MEMBER IN ROOM 1")
+response = requests.get(BASE + "room/1/user/not_member/messages")
 print(response.json())
 
 #"/api/room/<int:room_id>/messages"
