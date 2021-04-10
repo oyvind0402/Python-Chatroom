@@ -25,8 +25,23 @@ message_put_args.add_argument("room_id", type=int, help="Room id is required..."
 message_put_args.add_argument("user_name", type=str, help="Username is required", required=True)
 message_put_args.add_argument("message", type=str, action="append", required=True)
 
+message_get_args = reqparse.RequestParser()
+message_get_args.add_argument("room_id", type=int, help="Room id is required...", required=True)
+message_get_args.add_argument("username", type=str, help="Room id is required...")
+
 users = []
 rooms = []
+
+'''
+[
+    {'roomid': 0,
+    'userlist': ['user0', 'user1'],
+    'message_list': [
+        [user0, msg]
+        ]
+    }
+]
+'''
 
 # Create post args for messages
 
@@ -159,8 +174,28 @@ class RoomUser(Resource):
 
 
 class Message(Resource):
-    def get(self, room_id):
-        return
+    def get(self, room_id, username):
+
+
+    #CHANGE HERE
+        for room in rooms:
+            if room["roomid"] == room_id:
+                if username is None:
+                    return room["messages"], 201
+                
+                for user in room["userlist"]:
+                    if user == username:
+                        user_msgs = []
+                        for message in room["message_list"]:
+                            if message[0] == username:
+                                user_msgs.append(message[1])
+
+                        if len(user_msgs) == 0:
+                            return f("{username} has not sent any messages to room {room_id}"), 201
+                        else:
+                            return f("{username} has sent the following messages to room {room_id}: {user_msgs}")
+                abort(404, message=f"User hasn't been found in room: {room_id}...")
+            return
 
     def post(self, room_id, username):
         return
@@ -170,11 +205,13 @@ class Message(Resource):
             if room_id == room["roomid"]:
                 for username_room in room["userlist"]:
                     if username == username_room:
-                        room["message_list"].append(message)
+                        msg = [username, message]
+                        room["message_list"].append(msg)
                         return message, 201
                 abort(404, message=f"User is not part of this room: {room_id}...")
         abort(404, message=f"Couldnt find {room_id}...")
 
+#Maybe have only users in the room be able to check the messages
 
 api.add_resource(User, "/api/user/<string:username>", "/api/users")
 api.add_resource(Room, "/api/room/<int:room_id>", "/api/rooms")

@@ -92,6 +92,11 @@ print("RESULT FROM GET ALL ROOMUSERS")
 response = requests.get(BASE + "room/0/users")
 print(response.json())
 
+print("-------------------------------------------------------")
+print("RESULT FROM GET ROOMUSERS")
+response = requests.get(BASE + "room/1/users")
+print(response.json())
+
 # print("-------------------------------------------------------")
 # print("RESULT FROM POST A ROOMUSER")
 # response = requests.post(BASE + "room/1/users", {"user_id": 0})
@@ -102,13 +107,28 @@ print(response.json())
 # response = requests.post(BASE + "room/1/users", {"user_id": 1})
 # print(response.json())
 
+#/api/room/<int:room_id>/user/<string:username>/message/<string:message>"
 print("-------------------------------------------------------")
-print("RESULT FROM GET ROOMUSERS")
-response = requests.get(BASE + "room/1/users")
-print(response.json())
-
-print("-------------------------------------------------------")
-print("ADD MESSAGE TO ROOM 0")
+print("RESULT FROM PUT MESSAGE TO ROOM 0")
 response = requests.put(BASE + "room/0/user/someone/message/hey")
 print(response.json())
 
+print("-------------------------------------------------------")
+print("RESULT FROM PUT MESSAGE TO ROOM 1")
+response = requests.put(BASE + "room/1/user/oyvind91/message/hey")
+print(response.json())
+
+print("-------------------------------------------------------")
+print("RESULT FROM GET MESSAGES FROM OYVIND91 IN ROOM 0")
+response = requests.get(BASE + "room/0/user/oyvind91")
+print(response.json())
+
+
+print("-------------------------------------------------------")
+print("RESULT FROM GET MESSAGES FROM ROOM 0")
+response = requests.get(BASE + "room/0/messages")
+print(response.json())
+
+#"/api/room/<int:room_id>/messages"
+
+#Add more tests with possibility to fail
