@@ -60,6 +60,6 @@ while True:
             print(response.json())
         else:
             print("You decided not to show rooms.")
-            roomchoice = input("Type the room_id of the room you wish to join: ")
-            # Need to make sure the input is a number
-            response = requests.put(BASE + "room/" + roomchoice + "/user/" + username)
+        roomchoice = input("Type the room_id of the room you wish to join: ")
+        # Need to make sure the input is a number
+        response = requests.put(BASE + "room/" + roomchoice + "/user/" + username)
