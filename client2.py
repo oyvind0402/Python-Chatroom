@@ -107,3 +107,8 @@ print("RESULT FROM GET ROOMUSERS")
 response = requests.get(BASE + "room/1/users")
 print(response.json())
 
+print("-------------------------------------------------------")
+print("ADD MESSAGE TO ROOM 0")
+response = requests.put(BASE + "room/0/user/someone/message/hey")
+print(response.json())
+

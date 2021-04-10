@@ -20,21 +20,13 @@ room_user_put_args.add_argument("user_name", type=str, action="append", required
 room_user_get_args = reqparse.RequestParser()
 room_user_get_args.add_argument("room_id", type=int, help="Room id is required...", required=True)
 
-message_post_args = reqparse.RequestParser()
-message_post_args.add_argument("message", type=str, help="Message is required...", required=True)
+message_put_args = reqparse.RequestParser()
+message_put_args.add_argument("room_id", type=int, help="Room id is required...", required=True)
+message_put_args.add_argument("user_name", type=str, help="Username is required", required=True)
+message_put_args.add_argument("message", type=str, action="append", required=True)
 
 users = []
 rooms = []
-roomusers = []
-messages = {}
-
-
-# Append users
-# rooms[2]["userlist"].append()
-# get and put methods for room_user class resource
-# check if user exists in the userlist or abort
-
-# Append messages
 
 # Create post args for messages
 
@@ -101,7 +93,6 @@ class Room(Resource):
 
 
 class RoomUser(Resource):
-    # api.add_resource(RoomUser, "/api/room/<int:room_id>/user/<string:username>", "/api/room/<int:room_id>/users")
 
     def get(self, room_id, username=None):
         # room_id is a requirement otherwise client has to request all rooms in Room class
@@ -174,13 +165,21 @@ class Message(Resource):
     def post(self, room_id, username):
         return
 
+    def put(self, room_id, username, message):
+        for room in rooms:
+            if room_id == room["roomid"]:
+                for username_room in room["userlist"]:
+                    if username == username_room:
+                        room["message_list"].append(message)
+                        return message, 201
+                abort(404, message=f"User is not part of this room: {room_id}...")
+        abort(404, message=f"Couldnt find {room_id}...")
+
 
 api.add_resource(User, "/api/user/<string:username>", "/api/users")
 api.add_resource(Room, "/api/room/<int:room_id>", "/api/rooms")
 api.add_resource(RoomUser, "/api/room/<int:room_id>/user/<string:username>", "/api/room/<int:room_id>/users")
-
-
-# api.add_resource(Message, "/api/room/<int:room_id>/messages", "/api/room/<int:room_id>/<str:username>/messages")
+api.add_resource(Message, "/api/room/<int:room_id>/user/<string:username>/message/<string:message>", "/api/room/<int:room_id>/messages")
 
 
 @app.route('/')
