@@ -13,9 +13,18 @@ def active_connection(username):
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     ip = "127.0.0.2"
     port = 5001
-    client.connect((ip, port))
-    message = client.recv(1025)
-    print(message.decode())
+    try:
+        client.connect((ip, port))
+        client.send(username.encode())
+    except:
+        print("couldnt connect")
+    # message = client.recv(1025)
+    # print(message.decode())
+    # message = client.recv(1025)
+    # print(message.decode())
+    # message = client.recv(1025)
+    # print(message.decode())
+    # client.send(username.encode())
 
     # client.send(username.encode())
     # print("message send")
@@ -40,8 +49,8 @@ def add_user(username):
     print("USER POST")
     response = requests.post(BASE + "user/" + str(username))
     print_response(response)
-    if username == response.json():
-        connection = threading.Thread(target=active_connection(username))
+    if str(username) == response.json():
+        connection = threading.Thread(target=active_connection(str(str(username))))
         connection.start()
 
     print("-------------------------------------------------------")
@@ -110,11 +119,10 @@ def get_messages(room_id, username):
 
 print("--------------------------USER TESTS-----------------------------")
 add_user("oyvind91")
-sys.exit()
-
 add_user("oyvind91")
 add_user("someone")
 add_user(10)
+get_user()
 
 
 

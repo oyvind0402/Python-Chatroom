@@ -215,7 +215,14 @@ api.add_resource(Message, "/api/room/<int:room_id>/user/<string:username>/messag
 def index():
     return "SHITTY OBLIG 2"
 
+# api_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
 if __name__ == "__main__":
+    # ip = "127.0.0.2"
+    # port = 5001
+    # api_server.connect((ip, port))
+    # message = "api"
+    # api_server.send(message.encode())
     app.run(debug=True)
 
 
