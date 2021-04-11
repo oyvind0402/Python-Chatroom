@@ -11,8 +11,8 @@ print("true")
 
 def active_connection(username):
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    ip = "127.0.0.1"
-    port = 5000
+    ip = "127.0.0.2"
+    port = 5001
     client.connect((ip, port))
     message = client.recv(1025)
     print(message.decode())
