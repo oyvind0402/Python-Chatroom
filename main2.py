@@ -15,7 +15,7 @@ user_post_args.add_argument("username", type=str, help="Username is required..."
 # user_post_args.add_argument("usertype", type=str, help="Invalid syntax for usertype...", required=False)
 
 room_post_args = reqparse.RequestParser()
-room_post_args.add_argument("room_id", type=int, help="Room id is required...", required=True)
+room_post_args.add_argument("roomname", type=str, help="Roomname is required...", required=True)
 
 room_user_put_args = reqparse.RequestParser()
 room_user_put_args.add_argument("room_id", type=int, help="Room id is required...", required=True)
@@ -30,8 +30,7 @@ message_put_args.add_argument("user_name", type=str, help="Username is required"
 message_put_args.add_argument("message", type=str, action="append", help="Message cannot be empty", required=True)
 
 message_get_args = reqparse.RequestParser()
-message_get_args.add_argument("room_id", type=int, help="Room id is required...", required=True)
-message_get_args.add_argument("username", type=str, help="Room id is required...", required=True)
+message_get_args.add_argument("username", type=str, help="Username is required...", required=False)
 
 users = []
 rooms = {}
@@ -127,7 +126,9 @@ class Room(Resource):
     def put(self, room_id):
         room_id = str(room_id)
         abort_if_room_exists(room_id)
-        room = {"userlist": [], "message_list": []}
+        args = room_post_args.parse_args()
+
+        room = {"roomname": args["roomname"], "userlist": [], "message_list": []}
         rooms[room_id] = room
         return room_id, 201
 
@@ -168,13 +169,27 @@ class RoomUser(Resource):
 
 
 class Message(Resource):
-    def get(self, room_id, username):
+    def get(self, room_id, username=None):
         room_id = str(room_id)
 
-        abort_if_room_not_exists(room_id)
-        abort_if_roomuser_not_exists(room_id, username)
-        abort_if_message_list_empty(room_id)
-        return rooms[room_id]["message_list"], 201
+        args = message_get_args.parse_args()
+        if username != None:
+            abort_if_room_not_exists(room_id)
+            abort_if_roomuser_not_exists(room_id, username)
+            abort_if_message_list_empty(room_id)
+            return rooms[room_id]["message_list"], 200
+        else:
+            username = args["username"]
+            abort_if_room_not_exists(room_id)
+            abort_if_roomuser_not_exists(room_id, username)
+            abort_if_message_list_empty(room_id)
+            usermessages = []
+            for obj in rooms[room_id]["message_list"]:
+                if obj["username"] == username:
+                    usermessages.append(obj["message"])
+            return usermessages, 200
+
+        
 
     def post(self, room_id, username):
         return
@@ -184,7 +199,8 @@ class Message(Resource):
 
         abort_if_room_not_exists(room_id)
         abort_if_roomuser_not_exists(room_id, username)
-        rooms[room_id]["message_list"].append(message)
+        user_message = {"username": username, "message": message}
+        rooms[room_id]["message_list"].append(user_message)
         return message, 201
 
 
@@ -192,7 +208,7 @@ api.add_resource(User, "/api/user/<string:username>", "/api/users")
 api.add_resource(Room, "/api/room/<int:room_id>", "/api/rooms")
 api.add_resource(RoomUser, "/api/room/<int:room_id>/user/<string:username>", "/api/room/<int:room_id>/users")
 api.add_resource(Message, "/api/room/<int:room_id>/user/<string:username>/message/<string:message>",
-                 "/api/room/<int:room_id>/user/<string:username>/messages")
+                 "/api/room/<int:room_id>/user/<string:username>/messages", "/api/room/<int:room_id>/messages")
 
 
 @app.route('/')
