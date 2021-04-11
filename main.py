@@ -30,7 +30,6 @@ room_user_get_args.add_argument("username", type=str, help="Username is required
 
 message_put_args = reqparse.RequestParser()
 message_put_args.add_argument("username", type=str, help="Username is required", required=True)
-#TODO Check this mothafucka
 message_put_args.add_argument("message", type=str, help="Message cannot be empty", required=True)
 
 message_get_args = reqparse.RequestParser()
@@ -103,14 +102,15 @@ def abort_if_querier_not_in_room(querier, room_id):
 class User(Resource):
     def get(self, username=None):
         querier = user_get_args.parse_args()
-        abort_if_user_not_exists(querier['username'])
+        querier = querier['username']
+        abort_if_user_not_exists(querier)
 
         if username == None:
             return users, 200
         else:
             abort_if_user_not_exists(username)
             if username in users:
-                return username, 200
+                return f"User \"{username}\" is online", 200
 
     def post(self, username):
         abort_if_user_exists(username)
@@ -119,7 +119,8 @@ class User(Resource):
 
     def delete(self, username):
         querier = user_delete_args.parse_args()
-        abort_if_querier_does_not_match_user(querier['username'], username)
+        querier = querier['username']
+        abort_if_querier_does_not_match_user(querier, username)
         abort_if_user_not_exists(username)
         users.remove(username)
         for room_id in rooms:
@@ -131,8 +132,8 @@ class User(Resource):
 class Room(Resource):
     def get(self, room_id=None):
         querier = room_get_args.parse_args()
-        abort_if_user_not_exists(querier['username'])
-
+        querier = querier['username']
+        abort_if_user_not_exists(querier)
         if room_id is None:
             formatted_rooms = {}
             for key in rooms:
@@ -141,11 +142,17 @@ class Room(Resource):
         else:
             room_id = str(room_id)
             abort_if_room_not_exists(room_id)
-            return rooms[room_id], 200
+            
+            if querier in rooms[room_id]['userlist']:
+                room_resp = rooms[room_id]
+            else:
+                room_resp = {room_id : {"roomname": rooms[room_id]['roomname'], "userlist": rooms[room_id]['userlist']}}
+            return room_resp, 200
 
     def post(self, room_id):
         querier = room_post_args.parse_args()
-        abort_if_user_not_exists(querier['username'])
+        querier = querier['username']
+        abort_if_user_not_exists(querier)
 
         room_id = str(room_id)
         abort_if_room_exists(room_id)
@@ -159,7 +166,8 @@ class Room(Resource):
 class RoomUser(Resource):
     def get(self, room_id, username=None):
         querier = room_user_get_args.parse_args()
-        abort_if_user_not_exists(querier['username'])
+        querier = querier['username']
+        abort_if_user_not_exists(querier)
 
         room_id = str(room_id)
 
@@ -174,7 +182,8 @@ class RoomUser(Resource):
 
     def put(self, room_id, username):
         querier = room_user_put_args.parse_args()
-        abort_if_querier_does_not_match_user(querier['username'], username)
+        querier = querier['username']
+        abort_if_querier_does_not_match_user(querier, username)
         room_id = str(room_id)
 
         abort_if_user_not_exists(username)
@@ -185,41 +194,39 @@ class RoomUser(Resource):
 
 
 class Message(Resource):
-    def get(self, room_id, username=None):
-        room_id = str(room_id)
-        
-        querier = message_get_args.parse_args()
-        abort_if_querier_not_in_room(str(querier['username']), room_id)
-
-        args = message_get_args.parse_args()
-        if username is not None:
-            abort_if_room_not_exists(room_id)
-            abort_if_roomuser_not_exists(room_id, username)
-            abort_if_message_list_empty(room_id)
-            return rooms[room_id]["message_list"], 200
-        else:
-            username = args["username"]
-            abort_if_room_not_exists(room_id)
-            abort_if_roomuser_not_exists(room_id, username)
-            abort_if_message_list_empty(room_id)
-            usermessages = []
+    def get(self, room_id, username=None): 
+        room_id = str(room_id) 
+        querier = message_get_args.parse_args() 
+        abort_if_querier_not_in_room(querier['username'], room_id)
+        args = message_get_args.parse_args() 
+        if username is not None: 
+            abort_if_room_not_exists(room_id) 
+            abort_if_roomuser_not_exists(room_id, username) 
+            abort_if_message_list_empty(room_id) 
+            return rooms[room_id]["message_list"], 200 
+        else: 
+            username = args["username"] 
+            abort_if_room_not_exists(room_id) 
+            abort_if_roomuser_not_exists(room_id, username) 
+            abort_if_message_list_empty(room_id) 
+            usermessages = [] 
             for obj in rooms[room_id]["message_list"]:
-                if obj["username"] == username:
-                    usermessages.append(obj["message"])
-            return usermessages, 200 
+                if obj["username"] == username: 
+                    usermessages.append(obj["message"]) 
+                    return usermessages, 200
 
     def put(self, room_id, username):
-        querier = message_put_args.parse_args()
-        abort_if_querier_does_not_match_user(querier['username'], username)
-        print(querier)
-        
+        args = message_put_args.parse_args()
+        querier = args['username']
+        abort_if_querier_does_not_match_user(querier, username)
+    
         room_id = str(room_id)
 
         abort_if_room_not_exists(room_id)
         abort_if_roomuser_not_exists(room_id, username)
-        rooms[room_id]["message_list"].append(querier)
-        return querier["message"], 201
-
+        print(args)
+        rooms[room_id]["message_list"].append(args)
+        return args["message"], 201
 
 api.add_resource(User, "/api/user/<string:username>", "/api/users")
 api.add_resource(Room, "/api/room/<int:room_id>", "/api/rooms")
