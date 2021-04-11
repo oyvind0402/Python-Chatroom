@@ -93,7 +93,6 @@ while True:
                     response = requests.put(BASE + "room/" + roomchoice + "/user/" + username + "/message/" + usermessage)
                     if response.status_code != 201 :
                         print("Couldnt send message, something went wrong.")             
-                response = requests.get(BASE + "room/" + roomchoice + "/user/" + username + "/messages")
         elif response.status_code == 404:
             print("Couldnt join room " + roomchoice + ". No room with that ID.")
         else:
@@ -108,9 +107,9 @@ while True:
             print("You decided not to show rooms.")
         roomchoice = input("Type the room_id of the room you wish to see the messages in: ")
         response = requests.get(BASE + "room/" + roomchoice + "/messages", {"username": username})
-        print("Messages in room " + roomchoice + ":")
+        print("Messages in room " + roomchoice + " from " + username + ":")
         print(response.json())
-    elif message == 'showmymessages':
+    elif message == '--showmymessages':
         roommsg = input("If you want to see a list of rooms to check for messages in type '--show': ")
         if roommsg == '--show':
             response = requests.get(BASE + "rooms")
