@@ -1,3 +1,5 @@
+from threading import Timer
+
 import requests
 import time
 import sys
@@ -25,6 +27,36 @@ while True:
 
 print("Thanks for joining the server! Type --help for a list of commands.")
 
+def def_pass():
+    pass
+
+def chatroom(room_id):
+    in_room = True
+    message_input = ""
+
+    while in_room:
+        print(f"you are now in the room: {room_id}")
+        print("Feel free to type whatever you would like")
+        timeout = 5.0
+        timer_thread = Timer(timeout, def_pass)
+        timer_thread.start()
+        try:
+            message_input = input(username + ":")
+        except EOFError:
+            print("you have chosen to end the problem and that is your loss")
+            sys.exit()
+        timer_thread.cancel()
+        print("timer cancelled")
+
+        if message_input.__contains__("exit"):
+            break
+        response = requests.put(BASE + "room/" + str(room_id) + "/user/" + username + "/message/" + message_input)
+        print(response.json())
+        response = requests.get(BASE + "room/" + str(room_id) + "/user/" + username + "/messages")
+        print(response.json())
+
+
+
 
 while True:
     message = input(f'{username}: ')
@@ -43,6 +75,7 @@ while True:
                 if joinmessage == 'Y' or joinmessage == 'y' or joinmessage == 'yes' or joinmessage == 'Yes' or joinmessage == 'YES':
                     response = requests.put(BASE + "room/" + str(roomid) + "/user/" + username)
                     print("Joined " + roomname)
+                    chatroom(roomid)
                     break
                 elif joinmessage == 'N' or joinmessage == 'n' or joinmessage == 'no' or joinmessage == 'No' or joinmessage == 'NO':
                     break
@@ -67,6 +100,7 @@ while True:
         response = requests.put(BASE + "room/" + roomchoice + "/user/" + username)
         if response.status_code == 201:
             print(username + " successfully joined room " + roomchoice)
+            chatroom(roomchoice)
         elif response.status_code == 404:
             print("Couldnt join room " + roomchoice + ". No room with that ID.")
         else:

@@ -134,7 +134,6 @@ class Room(Resource):
 
 
 class RoomUser(Resource):
-
     def get(self, room_id, username=None):
         room_id = str(room_id)
 
@@ -156,24 +155,13 @@ class RoomUser(Resource):
         rooms[room_id]["userlist"].append(username)
         return username + " is connected to " + str(room_id), 201
 
-        for room in rooms:
-            if room["roomid"] == room_id:
-                if username is None:
-                    return room["userlist"], 201
-                else:
-                    for user in room["userlist"]:
-                        if user == username:
-                            return username + " is in the room " + str(room_id), 201
-                    abort(404, message=f"User hasn't been found in room: {room_id}...")
-        abort(404, message=f"Couldnt find {room_id}...")
-
 
 class Message(Resource):
     def get(self, room_id, username=None):
         room_id = str(room_id)
 
         args = message_get_args.parse_args()
-        if username != None:
+        if username is not None:
             abort_if_room_not_exists(room_id)
             abort_if_roomuser_not_exists(room_id, username)
             abort_if_message_list_empty(room_id)

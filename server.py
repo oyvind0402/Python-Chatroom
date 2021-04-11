@@ -1,7 +1,10 @@
 import socket
 import sys
 import threading
+import time
 from timeit import Timer
+
+import requests
 
 list_connections = []
 IP = "127.0.0.2"
@@ -13,8 +16,10 @@ push_socket.listen()
 
 print("Server is live")
 
+
 def placeholder():
     pass
+
 
 def listening(client):
     message = "A connection has been made"
@@ -25,31 +30,31 @@ def listening(client):
         if current_connection["connection"] == client:
             current_connection["username"] = username
             print(current_connection)
-    # if username == "api":
-    #     while True:
-    #         message = client.recv(1024)
-    #         print(message.decode())
-    # else:
-    #     # a client so we need to notify
-    #     client.close()
     print("yes")
+
+
+def new_messages():
     while True:
-        do = "somethin"
+        base = "http://127.0.0.1:5000/api/"
+        room = "rooms"
+        response = requests.get(base + room)
+        print(response.json())
+        time.sleep(10)
 
-    # username = push_socket.recv(1024).decode()
-    # print(username)
+def listen_connections():
+    while True:
+        print("code runs")
+        connection, address = push_socket.accept()
+        list_connections.append({"connection": connection, "username": ""})
+        new_client = threading.Thread(target=listening(connection))
+        new_client.start()
 
+listen_for_new_messages = threading.Thread(target=listen_connections)
+listen_for_new_messages.start()
 
 while True:
-    connection, address = push_socket.accept()
-    list_connections.append({"connection": connection, "username": ""})
-    new_client = threading.Thread(target=listening(connection))
-    new_client.start()
-
-
-def active_connection(client):
-    username = client.recv().decode()
-    for connection in list_connections:
-        if connection == client:
-            connection["username"] = username
-            client.send(connection.encode())
+    base = "http://127.0.0.1:5000/api/"
+    room = "rooms"
+    response = requests.get(base + room)
+    print(response.json())
+    time.sleep(10)
