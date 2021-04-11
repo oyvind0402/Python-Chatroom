@@ -67,7 +67,7 @@ def chatroom(room_id):
             response = requests.get(BASE + "room/" + str(room_id) + "/user/" + username + "/messages", {"username": username})
             print(response.json())
         else:
-            response = requests.put(BASE + "room/" + str(room_id) + "/user/" + username + "/message/" + message_input, {"username": username})
+            response = requests.put(BASE + "room/" + str(room_id) + "/user/" + username + "/messages", {"username": username, "message": message_input})
 
 def choose_room_prompt(username):
     roomchoice = input("Type the room ID. (To see a list of all rooms, type '--show'): ")
@@ -117,13 +117,14 @@ while True:
         elif message == '--join':
             roomchoice = choose_room_prompt(username)
             response = requests.put(BASE + "room/" + roomchoice + "/user/" + username, {"username": username})
-            if response.status_code == 201:
+            response2 = requests.get(BASE + "room/" + roomchoice + "/user/" + username, {"username": username})
+            if response.status_code == 201 or response2.status_code == 201:
                 print(username + " successfully joined room " + roomchoice)
                 chatroom(roomchoice)
             elif response.status_code == 404:
                 print("Couldnt join room " + roomchoice + ". No room with that ID.")
             else:
-                print("Something went wrong joining room " + roomchoice)
+                print(response.json())
         elif message == '--start':
             roomchoice = choose_room_prompt(username)
             response = requests.get(BASE + "room/" + roomchoice + "/user/" + username, {"username": username})
