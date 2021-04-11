@@ -31,7 +31,7 @@ room_user_get_args.add_argument("username", type=str, help="Username is required
 message_put_args = reqparse.RequestParser()
 message_put_args.add_argument("username", type=str, help="Username is required", required=True)
 #TODO Check this mothafucka
-#message_put_args.add_argument("message", type=str, action="append", help="Message cannot be empty", required=True)
+message_put_args.add_argument("message", type=str, help="Message cannot be empty", required=True)
 
 message_get_args = reqparse.RequestParser()
 message_get_args.add_argument("username", type=str, help="Username is required...", required=False)
@@ -95,8 +95,10 @@ def abort_if_message_list_empty(room_id):
         abort(404, message=f"Could not find any messages for room {room_id}")
 
 def abort_if_querier_not_in_room(querier, room_id):
+    if room_id not in rooms:
+        abort(404, message=f"Could not find room {room_id}")
     if querier not in rooms[room_id]['userlist']:
-        abort(401, message=f"You must be part of this room to post to it.")
+        abort(401, message=f"You must be part of this room to query it.")
 
 class User(Resource):
     def get(self, username=None):
@@ -135,8 +137,6 @@ class Room(Resource):
             formatted_rooms = {}
             for key in rooms:
                 formatted_rooms[key] = {"roomname": rooms[key]['roomname'], "userlist": rooms[key]['userlist']}
-                print(type(formatted_rooms))
-                print(type(formatted_rooms[key]))
             return formatted_rooms, 200
         else:
             room_id = str(room_id)
@@ -189,8 +189,6 @@ class Message(Resource):
         room_id = str(room_id)
         
         querier = message_get_args.parse_args()
-        print(querier)
-        print(querier['username'])
         abort_if_querier_not_in_room(str(querier['username']), room_id)
 
         args = message_get_args.parse_args()
@@ -210,24 +208,24 @@ class Message(Resource):
                     usermessages.append(obj["message"])
             return usermessages, 200 
 
-    def put(self, room_id, username, message):
+    def put(self, room_id, username):
         querier = message_put_args.parse_args()
         abort_if_querier_does_not_match_user(querier['username'], username)
+        print(querier)
         
         room_id = str(room_id)
 
         abort_if_room_not_exists(room_id)
         abort_if_roomuser_not_exists(room_id, username)
-        user_message = {"username": username, "message": message}
-        rooms[room_id]["message_list"].append(user_message)
-        return message, 201
+        rooms[room_id]["message_list"].append(querier)
+        return querier["message"], 201
 
 
 api.add_resource(User, "/api/user/<string:username>", "/api/users")
 api.add_resource(Room, "/api/room/<int:room_id>", "/api/rooms")
 api.add_resource(RoomUser, "/api/room/<int:room_id>/user/<string:username>", "/api/room/<int:room_id>/users")
-api.add_resource(Message, "/api/room/<int:room_id>/user/<string:username>/message/<string:message>",
-                 "/api/room/<int:room_id>/user/<string:username>/messages", "/api/room/<int:room_id>/messages")
+api.add_resource(Message, "/api/room/<int:room_id>/user/<string:username>/messages",
+                  "/api/room/<int:room_id>/messages")
 
 
 @app.route('/')
