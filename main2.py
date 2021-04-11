@@ -3,7 +3,6 @@ import socket
 import sys
 import threading
 import time
-import server
 from flask import Flask
 from flask_restful import Api, Resource, reqparse, abort
 
@@ -199,14 +198,6 @@ api.add_resource(Message, "/api/room/<int:room_id>/user/<string:username>/messag
 @app.route('/')
 def index():
     return "SHITTY OBLIG 2"
-
-
-# notifications = threading.Thread(target=push_notifications)
-# notifications.daemon = True
-# notifications.start()
-
-# notifcation = threading.Thread(exec(open("server.py").read()))
-# notifcation.start()
 
 if __name__ == "__main__":
     app.run(debug=True)
