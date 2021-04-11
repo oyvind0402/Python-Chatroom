@@ -1,6 +1,31 @@
+import socket
+import sys
+import threading
+import time
+
 import requests
 
 BASE = "http://127.0.0.1:5000/api/"
+
+print("true")
+
+def active_connection(username):
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    ip = "127.0.0.1"
+    port = 5000
+    client.connect((ip, port))
+    message = client.recv(1025)
+    print(message.decode())
+
+    # client.send(username.encode())
+    # print("message send")
+    # time.sleep(2)
+    # print("done sleeping")
+    # data = client.recv(1024)
+    # print(data.decode())
+
+
+
 
 def print_response(response):
     try:
@@ -10,14 +35,20 @@ def print_response(response):
     except:
         print("Invalid request.")
 
+
 def add_user(username):
     print("USER POST")
     response = requests.post(BASE + "user/" + str(username))
     print_response(response)
+    if username == response.json():
+        connection = threading.Thread(target=active_connection(username))
+        connection.start()
+
     print("-------------------------------------------------------")
 
+
 def get_user(username=None):
-    if username==None or username=="":
+    if username == None or username == "":
         print("USER GET ALL")
         response = requests.get(BASE + "users")
     else:
@@ -26,21 +57,24 @@ def get_user(username=None):
     print_response(response)
     print("-------------------------------------------------------")
 
+
 def add_room(id):
     print("ROOM POST")
-    response = requests.put(BASE + "room/"+str(id))
+    response = requests.put(BASE + "room/" + str(id))
     print_response(response)
     print("-------------------------------------------------------")
 
+
 def get_room(id=None):
-    if id==None:
+    if id == None:
         print("ROOM GET ALL")
         response = requests.get(BASE + "rooms")
     else:
         print("ROOM GET")
-        response = requests.get(BASE + "room/"+str(id))
+        response = requests.get(BASE + "room/" + str(id))
     print_response(response)
     print("-------------------------------------------------------")
+
 
 def add_roomuser(room_id, username):
     print("ROOMUSER PUT")
@@ -48,33 +82,41 @@ def add_roomuser(room_id, username):
     print_response(response)
     print("-------------------------------------------------------")
 
+
 def get_roomuser(room_id, username=None):
-    if username==None:
+    if username == None:
         print("ROOMUSER GET ALL")
-        response = requests.get(BASE + "room/"+str(room_id)+"/users")
+        response = requests.get(BASE + "room/" + str(room_id) + "/users")
     else:
         print("ROOMUSER GET")
-        response = requests.get(BASE + "room/"+str(room_id)+"/user/"+str(username))
+        response = requests.get(BASE + "room/" + str(room_id) + "/user/" + str(username))
     print_response(response)
     print("-------------------------------------------------------")
+
 
 def add_message(room_id, username, message):
     print("MESSAGE PUT")
-    response = requests.put(BASE + "room/"+str(room_id)+"/user/"+str(username)+"/message/"+str(message))
+    response = requests.put(BASE + "room/" + str(room_id) + "/user/" + str(username) + "/message/" + str(message))
     print_response(response)
     print("-------------------------------------------------------")
+
 
 def get_messages(room_id, username):
     print("MESSAGE GET")
-    response = requests.get(BASE + "room/"+str(room_id)+"/user/"+str(username)+"/messages")
+    response = requests.get(BASE + "room/" + str(room_id) + "/user/" + str(username) + "/messages")
     print_response(response)
     print("-------------------------------------------------------")
 
+
 print("--------------------------USER TESTS-----------------------------")
 add_user("oyvind91")
+sys.exit()
+
 add_user("oyvind91")
 add_user("someone")
 add_user(10)
+
+
 
 get_user("someone")
 get_user("not_member")
