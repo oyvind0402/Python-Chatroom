@@ -178,13 +178,19 @@ while True:
         elif message.startswith('--showmymessages'):
             roomchoice = check_if_followed_by_argument(username, '--showmymessages', message, "You need to choose a room in order to see your messages.")
             response = requests.get(BASE + "room/" + roomchoice + "/messages", {"username": username}) 
-            print("Messages in room " + roomchoice + " from " + username + ":")
-            print(response.json())
+            if response.status_code == 200:
+                print("Messages in room " + roomchoice + " from " + username + ":")
+                print(response.json())
+            else:
+                print("Couldn't show messages from room " + roomchoice + ". No room with that ID.")
         elif message.startswith('--showmessages'):
             roomchoice = check_if_followed_by_argument(username, '--showmessages', message, "You need to choose a room to check for messages.")
             response = requests.get(BASE + "room/" + roomchoice + "/user/" + username + "/messages", {"username": username})
-            print("Messages in room " + roomchoice + ":")
-            print(response.json())
+            if response.status_code == 200:
+                print("Messages in room " + roomchoice + ":")
+                print(response.json())
+            else:
+                print("Couldn't show messages from room " + roomchoice + ". No room with that ID.")
         elif message == '--exit':
             print("Are you sure you want to exit? This will DELETE your user!")
             answer = input("Y(es) or N(o): ")
