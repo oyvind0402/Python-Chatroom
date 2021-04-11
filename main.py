@@ -30,7 +30,7 @@ room_user_get_args.add_argument("username", type=str, help="Username is required
 
 message_put_args = reqparse.RequestParser()
 message_put_args.add_argument("username", type=str, help="Username is required", required=True)
-#TODO Check this mothafucka
+#TODO: Check this mothafucka
 #message_put_args.add_argument("message", type=str, action="append", help="Message cannot be empty", required=True)
 
 message_get_args = reqparse.RequestParser()

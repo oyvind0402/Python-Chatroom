@@ -69,6 +69,14 @@ def chatroom(room_id):
         else:
             response = requests.put(BASE + "room/" + str(room_id) + "/user/" + username + "/message/" + message_input, {"username": username})
 
+def choose_room_prompt(username):
+    roomchoice = input("Type the room ID. (To see a list of all rooms, type '--show'): ")
+    if roomchoice == '--show':
+        response = requests.get(BASE + "rooms", {"username": username})
+        print("Rooms:")
+        print(response.json())
+        roomchoice = input("Type the room_id of the room you wish to join: ")
+    return roomchoice
 
 #TODO Get one room only
 #TODO Get all room user for one room
@@ -107,14 +115,7 @@ while True:
             print("Rooms:")
             print(response.json())
         elif message == '--join':
-            roommsg = input("If you want to see a list of rooms to join type '--show': ")
-            if roommsg == '--show':
-                response = requests.get(BASE + "rooms", {"username": username})
-                print("Rooms:")
-                print(response.json())
-            else:
-                print("You decided not to show rooms.")
-            roomchoice = input("Type the room_id of the room you wish to join: ")
+            roomchoice = choose_room_prompt(username)
             response = requests.put(BASE + "room/" + roomchoice + "/user/" + username, {"username": username})
             if response.status_code == 201:
                 print(username + " successfully joined room " + roomchoice)
@@ -124,14 +125,7 @@ while True:
             else:
                 print("Something went wrong joining room " + roomchoice)
         elif message == '--start':
-            roommsg = input("If you want to see a list of rooms to join type '--show': ")
-            if roommsg == '--show':
-                response = requests.get(BASE + "rooms", {"username": username})
-                print("Rooms:")
-                print(response.json())
-            else:
-                print("You decided not to show rooms.")
-            roomchoice = input("Type the room_id of the room you wish to join: ")
+            roomchoice = choose_room_prompt(username)
             response = requests.get(BASE + "room/" + roomchoice + "/user/" + username, {"username": username})
             if response.status_code == 201:
                 print(username + " successfully joined room " + roomchoice)
@@ -150,26 +144,14 @@ while True:
             else:
                 print("Something went wrong joining room " + roomchoice)
         elif message == '--showmymessages':
-            roommsg = input("If you want to see a list of rooms to check for messages in type '--show': ")
-            if roommsg == '--show':
-                response = requests.get(BASE + "rooms", {"username": username})
-                print("Rooms:")
-                print(response.json())
-            else:
-                print("You decided not to show rooms.")
-            roomchoice = input("Type the room_id of the room you wish to see the messages in: ")
+            print("You need to choose a room in order to see your messages.")
+            roomchoice = choose_room_prompt(username)
             response = requests.get(BASE + "room/" + roomchoice + "/messages", {"username": username})
             print("Messages in room " + roomchoice + " from " + username + ":")
             print(response.json())
         elif message == '--showmessages':
-            roommsg = input("If you want to see a list of rooms to check for messages in type '--show': ")
-            if roommsg == '--show':
-                response = requests.get(BASE + "rooms", {"username": username})
-                print("Rooms:")
-                print(response.json())
-            else:
-                print("You decided not to show rooms.")
-            roomchoice = input("Type the room_id of the room you wish to see the messages in: ")
+            print("You need to choose a room to check for messages.")
+            rroomchoice = choose_room_prompt(username)
             response = requests.get(BASE + "room/" + roomchoice + "/user/" + username + "/messages", {"username": username})
             print("Messages in room " + roomchoice + ":")
             print(response.json())
@@ -178,7 +160,7 @@ while True:
             answer = input("Y(es) or N(o): ")
             answer = answer.lower()
             if answer == "y" or answer == "yes":
-                response = requests.delete(BASE + "user/" + username, {"username": username})
+                response = requests.delete(BASE + "user/" + username, data={"username": username})
                 sys.exit("You have exited the program. Goodbye.")
             elif answer == "n" or answer == "no":
                 continue
@@ -186,13 +168,13 @@ while True:
                 print("Invalid input. You will be taken back to the main terminal.")
     except (EOFError, KeyboardInterrupt):
         print("\nYou have chosen to leave the program and that is your loss. \nYour user is being deleted as revenge.")
-        response = requests.delete(BASE + "user/" + username, {"username": username})
+        response = requests.delete(BASE + "user/" + username, data={"username": username})
         sys.exit()
     except TimeoutError:
         print("\nYou're slow. Bye. \nPS: Your user has been deeeeeleeeeeeteeeeeed.")
-        response = requests.delete(BASE + "user/" + username, {"username": username})
+        response = requests.delete(BASE + "user/" + username, data={"username": username})
         sys.exit()
     except EOFError:
         print("\nOh no! Something's wrong. Bye :'( \nPS: Your user has been erased from our hearts.")
-        response = requests.delete(BASE + "user/" + username, {"username": username})
+        response = requests.delete(BASE + "user/" + username, data={"username": username})
         sys.exit()
