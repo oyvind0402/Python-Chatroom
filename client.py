@@ -67,7 +67,10 @@ def chatroom(room_id):
             response = requests.get(BASE + "room/" + str(room_id) + "/user/" + username + "/messages", {"username": username})
             print(response.json())
         else:
-            response = requests.put(BASE + "room/" + str(room_id) + "/user/" + username + "/messages", {"username": username, "message": message_input})
+            if len(message_input) < 1:
+                continue
+            else:
+                response = requests.put(BASE + "room/" + str(room_id) + "/user/" + username + "/messages", {"username": username, "message": message_input})
 
 def choose_room_prompt(username):
     roomchoice = input("Type the room ID. (To see a list of all rooms, type '--show'): ")
