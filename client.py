@@ -61,10 +61,13 @@ def chatroom(room_id):
 
         if message_input == "--exit":
             print(f"----- You have exited room {room_id} ------")
-            print("You are back in the main terminal.")
+            print("You are back in the main terminal")
             break
         elif message_input== "--help":
-             print("Type '--help' to show this help prompt\nType '--showmessages' to show all messages in this chatroom\nType '--exit' to leave the chatroom and go back to the main terminal.")
+             print("Type '--help' to show this help prompt\n"+
+             "Type '--showmessages' to show all messages in this chatroom\n"+
+             "Type '--showmymessages' to see your messages in this chatroom\n"+
+             "Type '--exit' to leave the chatroom and go back to the main terminal")
         elif message_input == "--showmessages":
             response = requests.get(BASE + "room/" + str(room_id) + "/user/" + username + "/messages", {"username": username})
             print(response.json())
@@ -101,9 +104,6 @@ def check_if_followed_by_argument(username, command, message, to_print=None, use
                 print(to_print)
             argument = input("Type the username to search: ")  
     return argument
-
-#TODO Be able to request other users
-
 
 while True:
     try:
