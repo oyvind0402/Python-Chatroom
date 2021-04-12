@@ -44,31 +44,16 @@ print("Thanks for joining the server! Type --help for a list of commands.")
 in_room = False
 
 
-def listening_for_messages(room_id, username):
-    global in_room
-    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    IP = "127.0.0.2"
-    port = 5001
-    client.connect((IP, port))
-    client.send(username.encode())
-    while in_room:
-        message_from_server = client.recv(1024)
-        print(message_from_server.decode())
-    print("reached")
-
-
-    # response = requests.get(BASE + "room/" + str(room_id) + "/messages", {"username": username})
-    # print("Messages in room " + str(room_id) + " from " + username + ":")
-    # print(response.json())
+def listening_for_messages():
+    pass
 
 def chatroom(room_id):
-    global in_room
     room_id = str(room_id)
 
     print(f"You are now in the room {room_id}")
     print("For help, type '--help'.")
 
-    while in_room:
+    while True:
         # timeout = 5.0
         try:
             # timer_thread = Timer(timeout, def_pass, [room_id])
@@ -82,7 +67,6 @@ def chatroom(room_id):
                 print("You are back in the main terminal")
                 # user gets deleted when leaving the room
                 requests.delete(BASE + "room/" + str(room_id) + "/user/" + username, data={"username": username})
-                in_room = False
                 break
             elif message_input== "--help":
                  print("Type '--help' to show this help prompt\n"+
@@ -158,9 +142,6 @@ while True:
                     if joinmessage == 'y' or joinmessage == 'yes':
                         response = requests.put(BASE + "room/" + str(roomid) + "/user/" + username, {"username": username})
                         print("Joined " + roomname)
-                        in_room = True
-                        # threading.Thread(target=listening_for_messages(roomid, username)).start()
-                        # threading.Thread(target=chatroom(roomid)).start()
                         chatroom(roomid)
                         break
                     elif joinmessage == 'n' or joinmessage == 'no':
