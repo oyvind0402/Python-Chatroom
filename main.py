@@ -243,9 +243,8 @@ class Message(Resource):
 
         abort_if_room_not_exists(room_id)
         abort_if_roomuser_not_exists(room_id, username)
-        print(args)
         rooms[room_id]["message_list"].append(args)
-        return args["message"], 201
+        return args, 201
 
 api.add_resource(User, "/api/user/<string:username>", "/api/users")
 api.add_resource(Room, "/api/room/<int:room_id>", "/api/rooms")

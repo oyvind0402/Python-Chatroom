@@ -2,6 +2,8 @@ import socket
 import threading
 from threading import Timer
 from client import *
+from keyboard import press_and_release
+from apscheduler.schedulers.background import BackgroundScheduler
 
 import requests
 import time
@@ -48,19 +50,40 @@ in_room = False
 def listening_for_messages():
     pass
 
+
+def enter():
+    press_and_release('enter')
+
+
 def chatroom(room_id):
     room_id = str(room_id)
 
     print(f"You are now in the room {room_id}")
     print("For help, type '--help'.")
+    readmessages = []
 
     while True:
-        # timeout = 5.0
         try:
-            # timer_thread = Timer(timeout, def_pass, [room_id])
-            # timer_thread.start()
+            response = requests.get(BASE + "room/" + str(room_id) + "/user/" + username + "/messages", {"username": username})
+            initialmessage = response.json()
+            
+            #Adding a background scheduler to press enter every 10 seconds to update the chat to see new messages.
+            #Basically polling every 10 seconds for new messages because the input is a blocking call stopping us
+            #from updating the get request for all messages in the chatroom.
+            scheduler = BackgroundScheduler()
+            scheduler.start()
+            scheduler.add_job(enter, 'interval', seconds=10)
+            
+            if response.status_code == 200:
+                for i in range(len(readmessages), len(response.json())):
+                    user = response.json()[i]["username"]
+                    msg = response.json()[i]["message"]
+                    if user != username:
+                        print(user + f" to room {room_id}: " + msg)
+                readmessages = response.json()
             message_input = input(username + " to room " + room_id + ": ")
             message_input = message_input.strip()
+            scheduler.shutdown()
             # timer_thread.cancel()
 
             if message_input == "--exit":
