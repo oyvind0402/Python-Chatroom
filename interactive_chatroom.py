@@ -46,11 +46,6 @@ print("Thanks for joining the server! Type --help for a list of commands.")
 
 in_room = False
 
-
-def listening_for_messages():
-    pass
-
-
 def enter():
     press_and_release('enter')
 
@@ -220,7 +215,7 @@ while True:
                 print(username + " successfully joined room " + roomchoice)
                 chatroom(roomchoice)
             elif response.status_code == 404:
-                print("Couldnt join room " + roomchoice)
+                print("Couldn't join room " + roomchoice)
             else:
                 print(response.json())
         elif message.startswith('--showmymessages'):
