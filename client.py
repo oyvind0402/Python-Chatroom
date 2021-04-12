@@ -1,3 +1,5 @@
+import socket
+import threading
 from threading import Timer
 
 import requests
@@ -39,47 +41,70 @@ while True:
 
 print("Thanks for joining the server! Type --help for a list of commands.")
 
-def def_pass():
-    pass
+in_room = False
+
+
+def listening_for_messages(room_id, username):
+    global in_room
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    IP = "127.0.0.2"
+    port = 5001
+    client.connect((IP, port))
+    client.send(username.encode())
+    while in_room:
+        message_from_server = client.recv(1024)
+        print(message_from_server.decode())
+    print("reached")
+
+
+    # response = requests.get(BASE + "room/" + str(room_id) + "/messages", {"username": username})
+    # print("Messages in room " + str(room_id) + " from " + username + ":")
+    # print(response.json())
 
 def chatroom(room_id):
+    global in_room
     room_id = str(room_id)
-    in_room = True
-    message_input = ""
+
     print(f"You are now in the room {room_id}")
     print("For help, type '--help'.")
 
     while in_room:
         # timeout = 5.0
-        # timer_thread = Timer(timeout, def_pass)
-        # timer_thread.start()
-        # try:
-        message_input = input(username + " to room " + room_id + ": ")
-        message_input = message_input.strip()
-        # timer_thread.cancel()
-        # print("timer cancelled")
+        try:
+            # timer_thread = Timer(timeout, def_pass, [room_id])
+            # timer_thread.start()
+            message_input = input(username + " to room " + room_id + ": ")
+            message_input = message_input.strip()
+            # timer_thread.cancel()
 
-        if message_input == "--exit":
-            print(f"----- You have exited room {room_id} ------")
-            print("You are back in the main terminal")
-            break
-        elif message_input== "--help":
-             print("Type '--help' to show this help prompt\n"+
-             "Type '--showmessages' to show all messages in this chatroom\n"+
-             "Type '--showmymessages' to see your messages in this chatroom\n"+
-             "Type '--exit' to leave the chatroom and go back to the main terminal")
-        elif message_input == "--showmessages":
-            response = requests.get(BASE + "room/" + str(room_id) + "/user/" + username + "/messages", {"username": username})
-            print(response.json())
-        elif message_input == "--showmymessages":
-            response = requests.get(BASE + "room/" + str(room_id) + "/messages", {"username": username}) 
-            print("Messages in room " + str(room_id) + " from " + username + ":")
-            print(response.json())
-        else:
-            if len(message_input) < 1:
-                continue
+            if message_input == "--exit":
+                print(f"----- You have exited room {room_id} ------")
+                print("You are back in the main terminal")
+                # user gets deleted when leaving the room
+                requests.delete(BASE + "room/" + str(room_id) + "/user/" + username, data={"username": username})
+                in_room = False
+                break
+            elif message_input== "--help":
+                 print("Type '--help' to show this help prompt\n"+
+                 "Type '--showmessages' to show all messages in this chatroom\n"+
+                 "Type '--showmymessages' to see your messages in this chatroom\n"+
+                 "Type '--exit' to leave the chatroom and go back to the main terminal")
+            elif message_input == "--showmessages":
+                response = requests.get(BASE + "room/" + str(room_id) + "/user/" + username + "/messages", {"username": username})
+                print(response.json())
+            elif message_input == "--showmymessages":
+                response = requests.get(BASE + "room/" + str(room_id) + "/messages", {"username": username})
+                print("Messages in room " + str(room_id) + " from " + username + ":")
+                print(response.json())
             else:
-                response = requests.put(BASE + "room/" + str(room_id) + "/user/" + username + "/messages", {"username": username, "message": message_input})
+                if len(message_input) < 1:
+                    continue
+                else:
+                    response = requests.put(BASE + "room/" + str(room_id) + "/user/" + username + "/messages", {"username": username, "message": message_input})
+        except (EOFError, KeyboardInterrupt):
+            print("You have chosen to leave the room. Press ctrl c again to leave the entire program")
+            requests.delete(BASE + "room/" + str(room_id) + "/user/" + username, data={"username": username})
+            break
 
 def choose_room_prompt(username):
     roomchoice = input("Type the room ID. (To see a list of all rooms, type '--show'): ")
@@ -133,6 +158,9 @@ while True:
                     if joinmessage == 'y' or joinmessage == 'yes':
                         response = requests.put(BASE + "room/" + str(roomid) + "/user/" + username, {"username": username})
                         print("Joined " + roomname)
+                        in_room = True
+                        # threading.Thread(target=listening_for_messages(roomid, username)).start()
+                        # threading.Thread(target=chatroom(roomid)).start()
                         chatroom(roomid)
                         break
                     elif joinmessage == 'n' or joinmessage == 'no':

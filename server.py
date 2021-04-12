@@ -29,8 +29,12 @@ def listening(client):
     for current_connection in list_connections:
         if current_connection["connection"] == client:
             current_connection["username"] = username
-            print(current_connection)
-    print("yes")
+            print(current_connection["username"] + " is connected")
+    while True:
+        time.sleep(15)
+        hi = "hei"
+        client.send(hi.encode())
+
 
 
 def new_messages():
@@ -41,6 +45,7 @@ def new_messages():
         print(response.json())
         time.sleep(10)
 
+
 def listen_connections():
     while True:
         print("code runs")
@@ -48,6 +53,7 @@ def listen_connections():
         list_connections.append({"connection": connection, "username": ""})
         new_client = threading.Thread(target=listening(connection))
         new_client.start()
+
 
 listen_for_new_messages = threading.Thread(target=listen_connections)
 listen_for_new_messages.start()

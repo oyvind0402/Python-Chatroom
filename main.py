@@ -28,6 +28,9 @@ room_user_put_args.add_argument("username", type=str, help="Username is required
 room_user_get_args = reqparse.RequestParser()
 room_user_get_args.add_argument("username", type=str, help="Username is required", required=True)
 
+room_user_delete_args = reqparse.RequestParser()
+room_user_delete_args.add_argument("username", type=str, help="Username is required", required=True)
+
 message_put_args = reqparse.RequestParser()
 message_put_args.add_argument("username", type=str, help="Username is required", required=True)
 message_put_args.add_argument("message", type=str, help="Message cannot be empty", required=True)
@@ -87,6 +90,10 @@ def abort_if_roomuser_not_exists(room_id, username):
 def abort_if_roomuser_exists(room_id, username):
     if username in rooms[room_id]["userlist"]:
         abort(409, message=f"User \"{username}\" is already in room {room_id}")
+
+def abort_if_roomuser_does_not_exists(room_id, username):
+    if username not in rooms[room_id]["userlist"]:
+        abort(409, message=f"User \"{username}\" is not in room {room_id}")
 
 
 def abort_if_message_list_empty(room_id):
@@ -191,6 +198,18 @@ class RoomUser(Resource):
         abort_if_roomuser_exists(room_id, username)
         rooms[room_id]["userlist"].append(username)
         return username + " is connected to " + str(room_id), 201
+
+    def delete(self, room_id, username):
+        querier = room_user_delete_args.parse_args()
+        querier = querier['username']
+        abort_if_querier_does_not_match_user(querier, username)
+        room_id = str(room_id)
+
+        abort_if_user_not_exists(username)
+        abort_if_room_not_exists(room_id)
+        abort_if_roomuser_does_not_exists(room_id, username)
+        rooms[room_id]["userlist"].remove(username)
+        return username + " is removed from " + str(room_id), 201
 
 
 class Message(Resource):
