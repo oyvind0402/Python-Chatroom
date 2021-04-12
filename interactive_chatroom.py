@@ -61,20 +61,22 @@ def chatroom(room_id):
     print(f"You are now in the room {room_id}")
     print("For help, type '--help'.")
     readmessages = []
-
+    
     while True:
         try:
             response = requests.get(BASE + "room/" + str(room_id) + "/user/" + username + "/messages", {"username": username})
             initialmessage = response.json()
-            
+
             #Adding a background scheduler to press enter every 10 seconds to update the chat to see new messages.
             #Basically polling every 10 seconds for new messages because the input is a blocking call stopping us
             #from updating the get request for all messages in the chatroom.
-            scheduler = BackgroundScheduler()
-            scheduler.start()
-            scheduler.add_job(enter, 'interval', seconds=10)
-            
+            scheduling = False
             if response.status_code == 200:
+                if len(initialmessage) > len(readmessages):
+                    scheduler = BackgroundScheduler()
+                    scheduler.start()
+                    scheduling = True
+                    scheduler.add_job(enter, 'interval', seconds=10)
                 for i in range(len(readmessages), len(response.json())):
                     user = response.json()[i]["username"]
                     msg = response.json()[i]["message"]
@@ -83,9 +85,10 @@ def chatroom(room_id):
                 readmessages = response.json()
             message_input = input(username + " to room " + room_id + ": ")
             message_input = message_input.strip()
-            scheduler.shutdown()
+            if scheduling == True:
+                scheduler.shutdown()
+                scheduling = False
             # timer_thread.cancel()
-
             if message_input == "--exit":
                 print(f"----- You have exited room {room_id} ------")
                 print("You are back in the main terminal")
