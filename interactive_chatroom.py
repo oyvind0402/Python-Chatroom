@@ -47,11 +47,9 @@ while True:
 
 print("Thanks for joining the server! Type --help for a list of commands.")
 
-in_room = False
-
 def listening(room_id):
     # We used this to test to run several threads
-    # However it seems that we cannot run this function and the chatroom ant the same time.
+    # However it seems that we cannot run this function and the chatroom at the same time.
     # We think this is because threads depends on I/O and since def listening is constant running this messes thing up
     # We also used a timed thread but but this doesn't change the fact that input() is blocking and therefor not working
     # The only solution (we could think of) would be a push from the server
@@ -83,7 +81,7 @@ def listening(room_id):
 
 def chatroom(room_id):
     room_id = str(room_id)
-    # We didnt make this work because see def listening for explanation
+    # Part of the code we didnt make work - keeping it here to show we tried implementing push notifications.
     # listening_thread = threading.Thread(target=listening(room_id))
     # listening_thread.start()
 
