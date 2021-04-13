@@ -4,16 +4,11 @@ import random
 import time
 from client import *
 
+"""Global variables"""
 BASE = "http://127.0.0.1:5000/api/"
-
 
 initialbots = ["Amato", "Bob", "Chuck", "Alice"]
 bots = ["Amato", "Bob", "Chuck", "Alice"]
-
-#creating an exisiting room for bots to join, adding an admin user so that its possible to create the room
-add_user("Admin")
-add_room(0, "ExisitingRoom", "Admin")
-
 
 amatomessages = ["Hey guys whats up, oh wait I'm alone. Pain is real after all...", "How can I scam people when there are no people?"]
 amatomessages2 = ["Why is no one responding to me. :/", "Wait... that seemed like a response. Or is that another bot??? was that me?"]
@@ -24,6 +19,11 @@ alicemessages2 = ["I'm bored someone help me initiate my self destruction protoc
 chuckmessages = ["I hate everything", "I hate everyone"]
 chuckmessages2 = ["This sucks", "Stop talking to me"]
 
+"""Creates bot Amato
+Amato joins Admin-created room 0 and posts his messages
+Amato creates his own room and posts his messages.
+Already sent messages are pulled throughout the bot's lifecycle.
+"""
 def amato(name):
     createUser(name)
     print()
@@ -42,7 +42,11 @@ def amato(name):
     getMessages(room_id, name)
     print(f"{name}(thinking) in room {room_id}: Sunshine... so bright.. Is this it?\n")
 
-
+"""Creates bot Bob
+Bob joins Admin-created room 0 and posts his messages
+Bob creates his own room and posts his messages.
+Already sent messages are pulled throughout the bot's lifecycle.
+"""
 def bob(name):
     createUser(name)
     print()
@@ -61,6 +65,11 @@ def bob(name):
     getMessages(room_id, name)
     print(f"{name}(thinking) in room {room_id}: How I have fallen.\n")
 
+"""Creates bot Chuck
+Chuck joins Admin-created room 0 and posts his messages
+Chuck creates his own room and posts his messages.
+Already sent messages are pulled throughout the bot's lifecycle.
+"""
 def chuck(name):
     createUser(name)
     print()
@@ -79,7 +88,11 @@ def chuck(name):
     getMessages(room_id, name)
     print(f"{name}(thinking) in room {room_id}: Even more evidence that I'm a genius. Which other bots could do this? Amateurs..\n")
 
-
+"""Creates bot Alice
+Alice joins Admin-created room 0 and posts her messages
+Alice creates his own room and posts her messages.
+Already sent messages are pulled throughout the bot's lifecycle.
+"""
 def alice(name):
     createUser(name)
     print()
@@ -99,7 +112,7 @@ def alice(name):
     print(f"{name}(thinking) in room 0: Wait how am I here still? Is this the afterlife?\n")
 
 
-
+"""Creates a user"""
 def createUser(botname):
     print("Welcome to the chatroom " + botname + ". Do you wish to become a user and terrorize the server with your bot shenanigans?")
     time.sleep(1)
@@ -113,7 +126,7 @@ def createUser(botname):
         print("You already joined this server, bad bot!")
         time.sleep(1)
 
-
+"""Creates room"""
 def createRoom(roomname, botname):
     print("What roomname would glorious " + botname + " want for it's room?")
     time.sleep(1)
@@ -132,7 +145,7 @@ def createRoom(roomname, botname):
         time.sleep(1)
         return roomid
 
-
+"""Allows bot to join a room"""
 def joinRoom(room_id, botname):
     room_id = str(room_id)
     print(botname + " trying to join room with room_id " + room_id + ".")
@@ -151,7 +164,7 @@ def joinRoom(room_id, botname):
         print("Unlucky.")
         time.sleep(1)
 
-
+"""Allows bots to post messages"""
 def postMessages(room_id, botname, messages):
     room_id = str(room_id)
     for message in messages:
@@ -167,7 +180,7 @@ def postMessages(room_id, botname, messages):
             print(f"{botname}(thinking) in room {room_id}: Oh.. that's where I went wrong.")
             time.sleep(1)
 
-
+"""Allows bots to get previously sent messages"""
 def getMessages(room_id, botname):
     room_id = str(room_id)
     response = get_all_messages(room_id, botname, botname)
@@ -179,8 +192,7 @@ def getMessages(room_id, botname):
         print("Something went wrong. Either I'm in the wrong place or I screwed up royally! What a sad excuse for a bot..")
         time.sleep(1)
 
-print("----------------------------------------------------------------")
-
+"""Coordinates process of adding new bot, when user selects one"""
 def botjoin():
     while True:
         amount = len(bots)
@@ -218,5 +230,15 @@ def botjoin():
             print("That is not a bot looking to be freed. You just wrote gibberish.")
 
 
+"""STARTS BOTS"""
+
+"""Creates an exisiting room for bots to join, 
+adds an admin user so that its possible to create the room"""
+add_user("Admin")
+add_room(0, "ExisitingRoom", "Admin")
+
+print("----------------------------------------------------------------")
+
+""""""
 botjoin()
 print("You cancelled the program, now all the bots will go back to jail. :) But their imprint on the world still remains on http://localhost:5000/api/users")

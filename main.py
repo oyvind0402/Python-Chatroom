@@ -9,6 +9,8 @@ from flask_restful import Api, Resource, reqparse, abort
 app = Flask(__name__)
 api = Api(app)
 
+"""REQUEST PARSING SECTION"""
+"""Creates request parser for JSON data sent through requests"""
 user_get_args = reqparse.RequestParser()
 user_get_args.add_argument("username", type=str, help="Username is required", required=True)
 
@@ -36,12 +38,16 @@ message_put_args.add_argument("username", type=str, help="Username is required",
 message_put_args.add_argument("message", type=str, help="Message cannot be empty", required=True)
 
 message_get_args = reqparse.RequestParser()
-message_get_args.add_argument("username", type=str, help="Username is required...", required=False)
+message_get_args.add_argument("username", type=str, help="Username is required", required=False)
 
-users = []
+users = []  
+"""User structure
+["item", "item"]
+"""
+
 rooms = {}
-
 '''
+Rooms structure
 {
     0 : {
         'roomname': name,
@@ -52,7 +58,8 @@ rooms = {}
 '''
 
 
-# Create post args for messages
+"""ABORT SECTION"""
+"""Identifies different situations in which program needs to abort and defines response."""
 def abort_if_user_not_exists(username):
     if username not in users:
         abort(404, message=f"Could not find user \"{username}\"")
@@ -106,7 +113,12 @@ def abort_if_querier_not_in_room(querier, room_id):
     if querier not in rooms[room_id]['userlist']:
         abort(401, message=f"You must be part of this room to query it.")
 
+
+"""RESOURCES SECTION"""
+"""Defines resources"""
+
 class User(Resource):
+    """Gets one or all users"""
     def get(self, username=None):
         querier = user_get_args.parse_args()
         querier = querier['username']
@@ -119,11 +131,13 @@ class User(Resource):
             if username in users:
                 return f"User \"{username}\" is online", 200
 
+    """Adds one user"""
     def post(self, username):
         abort_if_user_exists(username)
         users.append(username)
         return username, 201
 
+    """Deletes one user"""
     def delete(self, username):
         querier = user_delete_args.parse_args()
         querier = querier['username']
@@ -137,6 +151,7 @@ class User(Resource):
 
 
 class Room(Resource):
+    """Gets one or all rooms"""
     def get(self, room_id=None):
         querier = room_get_args.parse_args()
         querier = querier['username']
@@ -151,11 +166,15 @@ class Room(Resource):
             abort_if_room_not_exists(room_id)
             
             if querier in rooms[room_id]['userlist']:
+                """If user who made the room request is in room, display all data"""
                 room_resp = rooms[room_id]
+            
             else:
+                """Else, do not display messages"""
                 room_resp = {room_id : {"roomname": rooms[room_id]['roomname'], "userlist": rooms[room_id]['userlist']}}
             return room_resp, 200
 
+    """Creates a new room (must have a unique room ID)"""
     def post(self, room_id):
         querier = room_post_args.parse_args()
         querier = querier['username']
@@ -170,7 +189,8 @@ class Room(Resource):
         return room_id, 201
 
 
-class RoomUser(Resource):
+class RoomUser(Resource):       #RoomUser = user in relation to a room
+    """Gets one or all roomusers"""
     def get(self, room_id, username=None):
         querier = room_user_get_args.parse_args()
         querier = querier['username']
@@ -187,6 +207,7 @@ class RoomUser(Resource):
             abort_if_roomuser_not_exists(room_id, username)
             return username + " is in the room " + str(room_id), 201
 
+    """Adds one user to room"""
     def put(self, room_id, username):
         querier = room_user_put_args.parse_args()
         querier = querier['username']
@@ -199,6 +220,7 @@ class RoomUser(Resource):
         rooms[room_id]["userlist"].append(username)
         return username + " is connected to " + str(room_id), 201
 
+    """Deletes one user from room"""
     def delete(self, room_id, username):
         querier = room_user_delete_args.parse_args()
         querier = querier['username']
@@ -213,6 +235,7 @@ class RoomUser(Resource):
 
 
 class Message(Resource):
+    """Gets messages from one or all users in a room"""
     def get(self, room_id, username=None): 
         room_id = str(room_id) 
         querier = message_get_args.parse_args() 
@@ -234,6 +257,7 @@ class Message(Resource):
                     usermessages.append(obj["message"]) 
                     return usermessages, 200
 
+    """Adds message to room"""
     def put(self, room_id, username):
         args = message_put_args.parse_args()
         querier = args['username']
@@ -246,6 +270,7 @@ class Message(Resource):
         rooms[room_id]["message_list"].append(args)
         return args, 201
 
+"""ROUTE SECTION"""
 api.add_resource(User, "/api/user/<string:username>", "/api/users")
 api.add_resource(Room, "/api/room/<int:room_id>", "/api/rooms")
 api.add_resource(RoomUser, "/api/room/<int:room_id>/user/<string:username>", "/api/room/<int:room_id>/users")
@@ -257,9 +282,11 @@ api.add_resource(Message, "/api/room/<int:room_id>/user/<string:username>/messag
 def index():
     return "OBLIG 2"
 
+"""Part of attempt of implementing push notifications"""
 # api_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 if __name__ == "__main__":
+    """Part of attempt of implementing push notifications"""
     # ip = "127.0.0.2"
     # port = 5001
     # api_server.connect((ip, port))
