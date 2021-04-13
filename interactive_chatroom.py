@@ -310,9 +310,9 @@ while True:
                 print("Messages in room " + roomchoice + ":")
                 print(response.json())
             elif response.status_code == 404:
-                print(response.json())
+                print("Couldn't find room with room_id " + roomchoice)
             elif response.status_code == 401:
-                print(response.json())
+                print("You must be a part of this room to query messages from it")
             else:
                 print("Couldn't show messages from room " + roomchoice)
         elif message == '--exit':
