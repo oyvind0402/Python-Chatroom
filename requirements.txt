@@ -1,4 +1,6 @@
-apscheduler==3.7.0
 Flask==1.1.2
 Flask-RESTful==0.3.8
-keyboard==0.13.5
+
+#Below are requirements that are unused atm, they were used for an attempt at push notifications.
+#keyboard==0.13.5
+#apscheduler==3.7.0

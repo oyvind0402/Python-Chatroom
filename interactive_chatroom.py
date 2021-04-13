@@ -2,8 +2,10 @@ import socket
 import threading
 from threading import Timer
 from client import *
-from keyboard import press_and_release
-from apscheduler.schedulers.background import BackgroundScheduler
+
+#Unused imports at the moment, they were a part of our attempt at push notifications.
+#from keyboard import press_and_release
+#from apscheduler.schedulers.background import BackgroundScheduler
 
 import requests
 import time
@@ -46,17 +48,18 @@ print("Thanks for joining the server! Type --help for a list of commands.")
 
 in_room = False
 
-def enter():
-    press_and_release('enter')
+#Function to use the keyboard.press_and_release import, which presses enter. Unused atm, it was part of an unsuccessful attempt at push notifications.
+# def enter():
+#     press_and_release('enter')
 
 
 def chatroom(room_id):
     room_id = str(room_id)
 
-    print(f"You are now in the room {room_id}")
-    print("For help, type '--help'.")
+    print(f"You are now in room {room_id}")
+    print("For help, type '--help'.\nTo see new messages press enter/return without typing anything.")
     readmessages = []
-    
+
     while True:
         try:
             response = requests.get(BASE + "room/" + str(room_id) + "/user/" + username + "/messages", {"username": username})
@@ -65,13 +68,20 @@ def chatroom(room_id):
             #Adding a background scheduler to press enter every 10 seconds to update the chat to see new messages.
             #Basically polling every 10 seconds for new messages because the input is a blocking call stopping us
             #from updating the get request for all messages in the chatroom.
-            scheduling = False
+            #This was our way of doing push notifications - instead of pressing enter it could also be sending a message like "A new message has appeared in your chat room, press enter to see it."
+            #The problem with this is that if you're running two terminals on the same computer it can only emulate one enter keypress and it will continue doing it untill you do a press of enter in
+            #The initial terminal the background process started in. So it will continue pressing enter every 10 seconds in any active window, even outside of the program.
+
+            #scheduling = False
             if response.status_code == 200:
-                if len(initialmessage) > len(readmessages):
-                    scheduler = BackgroundScheduler()
-                    scheduler.start()
-                    scheduling = True
-                    scheduler.add_job(enter, 'interval', seconds=10)
+                #Unused code for the background scheduler pressing enter (through the enter function)
+                # if len(initialmessage) > len(readmessages):
+                #     scheduler = BackgroundScheduler()
+                #     scheduler.start()
+                #     scheduling = True
+                #     scheduler.add_job(enter, 'interval', seconds=10)
+
+
                 for i in range(len(readmessages), len(response.json())):
                     user = response.json()[i]["username"]
                     msg = response.json()[i]["message"]
@@ -80,9 +90,9 @@ def chatroom(room_id):
                 readmessages = response.json()
             message_input = input(username + " to room " + room_id + ": ")
             message_input = message_input.strip()
-            if scheduling == True:
-                scheduler.shutdown()
-                scheduling = False
+            # if scheduling == True:
+            #     scheduler.shutdown()
+            #     scheduling = False
             # timer_thread.cancel()
             if message_input == "--exit":
                 print(f"----- You have exited room {room_id} ------")
@@ -90,7 +100,8 @@ def chatroom(room_id):
                 # user gets deleted when leaving the room
                 break
             elif message_input== "--help":
-                 print("Type '--help' to show this help prompt\n"+
+                 print("Type '--help' to show this help prompt\n" +
+                 "Press enter/return without typing anything to update the chatroom to see new messages.\n"+
                  "Type '--showmessages' to show all messages in this chatroom\n"+
                  "Type '--showmymessages' to see your messages in this chatroom\n"+
                  "Type '--exit' to leave the chatroom and go back to the main terminal\n"+
