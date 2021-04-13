@@ -241,4 +241,4 @@ print("----------------------------------------------------------------")
 
 """"""
 botjoin()
-print("You cancelled the program, now all the bots will go back to jail. :) But their imprint on the world still remains on http://localhost:5000/api/users")
+print("You cancelled the program, now all the bots will go back to jail. :) But their imprint on the world still remains on http://localhost:5000/api/rooms?username=Admin")

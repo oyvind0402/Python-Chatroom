@@ -262,7 +262,7 @@ while True:
                     elif joinmessage == 'n' or joinmessage == 'no':
                         break
                     else:
-                        print("That did not seem like a yes. You have not been added to the room. If you wish to goin it, use '--join'")
+                        print("That did not seem like a yes. You have not been added to the room. If you wish to join it, use '--join'")
                 elif response.status_code == 409:
                     print("A room already exists with that roomname, try again.")
                     continue
