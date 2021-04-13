@@ -71,6 +71,7 @@ def chatroom(room_id):
             #This was our way of doing push notifications - instead of pressing enter it could also be sending a message like "A new message has appeared in your chat room, press enter to see it."
             #The problem with this is that if you're running two terminals on the same computer it can only emulate one enter keypress and it will continue doing it untill you do a press of enter in
             #The initial terminal the background process started in. So it will continue pressing enter every 10 seconds in any active window, even outside of the program.
+            #We decided not to use it because of this fault in the process in combination with our program. Having it continually press enter untill it does it in the right window isnt a good way to deal with it.
 
             #scheduling = False
             if response.status_code == 200:
