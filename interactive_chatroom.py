@@ -1,17 +1,16 @@
-import socket
-import threading
-from threading import Timer
 from client import *
-
-#Unused imports at the moment, they were a part of our attempt at push notifications.
-#from keyboard import press_and_release
-#from apscheduler.schedulers.background import BackgroundScheduler
-
 import requests
 import time
 import sys
 import socket
-import random
+
+#Unused imports at the moment, they were a part of our attempt at push notifications.
+#from keyboard import press_and_release
+#from apscheduler.schedulers.background import BackgroundScheduler
+#import threading
+#from threading import Timer
+
+
 
 
 print("----------------------------------------------")
@@ -174,13 +173,18 @@ def chatroom(room_id):
             response = delete_user(username, username)
             sys.exit()
 
+is_join = False
+
 def choose_room_prompt(username):
     roomchoice = input("Type the room ID. (To see a list of all rooms, type '--show'): ")
     if roomchoice.strip() == '--show':
         response = get_all_rooms(username)
         print("Rooms:")
         print(response.json())
-        roomchoice = input("Type the room_id of the room you wish to join: ")
+        if is_join == True:
+            roomchoice = input("Type the room_id of the room you wish to join: ")
+        else:
+            roomchoice = input("Type the room_id of the room you want to query: ")
     return roomchoice.strip()
 
 def check_if_followed_by_argument(username, command, message, to_print=None, user_search=False):
@@ -250,14 +254,31 @@ while True:
             print("Rooms:")
             print(response.json())
         elif message.startswith('--showroomusers'):
+            is_join == False
             roomchoice = check_if_followed_by_argument(username, '--showroomusers', message)
             response = get_all_roomusers(roomchoice, username)
-            print(response.json())
+            if response.status_code == 200:
+                print(response.json())
+            elif response.status_code == 404:
+                print("Couldn't find room with room_id " + roomchoice)
+            elif response.status_code == 401:
+                print("You must be a user to query the room")
+            else:
+                print("Couldn't query room with room_id " + roomchoice)
         elif message.startswith('--showroom'):
+            is_join == False
             roomchoice = check_if_followed_by_argument(username, '--showroom', message)
             response = get_room(roomchoice, username)
-            print(response.json())
+            if response.status_code == 200:
+                print(response.json())
+            elif response.status_code == 404:
+                print("Couldn't find room with room_id " + roomchoice)
+            elif response.status_code == 401:
+                print("You must be a user to query the room")
+            else:
+                print("Couldn't query room with room_id " + roomchoice)
         elif message.startswith('--join'):
+            is_join == True
             roomchoice = check_if_followed_by_argument(username, '--join', message)
             response = add_roomuser(roomchoice, username, username)
             response2 = get_roomuser(roomchoice, username, username)
@@ -269,21 +290,31 @@ while True:
             else:
                 print(response.json())
         elif message.startswith('--showmymessages'):
+            is_join == False
             roomchoice = check_if_followed_by_argument(username, '--showmymessages', message, "You need to choose a room in order to see your messages.")
             response = get_messages(roomchoice, username)
             if response.status_code == 200:
                 print("Messages in room " + roomchoice + " from " + username + ":")
                 print(response.json())
+            elif response.status_code == 404:
+                print("Couldn't find room with room_id " + roomchoice)
+            elif response.status_code == 401:
+                print("You must be a part of this room to query messages from it")
             else:
                 print("Couldn't show messages from room " + roomchoice)
         elif message.startswith('--showmessages'):
+            is_join == False
             roomchoice = check_if_followed_by_argument(username, '--showmessages', message, "You need to choose a room to check for messages.")
             response = get_all_messages(roomchoice, username, username)
             if response.status_code == 200:
                 print("Messages in room " + roomchoice + ":")
                 print(response.json())
+            elif response.status_code == 404:
+                print(response.json())
+            elif response.status_code == 401:
+                print(response.json())
             else:
-                print("Couldn't show messages from room " + roomchoice + ". No room with that ID.")
+                print("Couldn't show messages from room " + roomchoice)
         elif message == '--exit':
             print("Are you sure you want to exit? This will DELETE your user!")
             answer = input("y/[N]: ")
