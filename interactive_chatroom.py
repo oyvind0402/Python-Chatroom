@@ -10,6 +10,7 @@ from client import *
 import requests
 import time
 import sys
+import socket
 import random
 
 
@@ -48,6 +49,33 @@ print("Thanks for joining the server! Type --help for a list of commands.")
 
 in_room = False
 
+def listening(room_id):
+    # We used this to test to run several threads
+    # However it seems that we cannot run this function and the chatroom ant the same time.
+    # We think this is because threads depends on I/O and since def listening is constant running this messes thing up
+    # We also used a timed thread but but this doesn't change the fact that input() is blocking and therefor not working
+    # The only solution (we could think of) would be a push from the server
+    # but unfortunately we didnt get this to work either (see server.py)
+    IP = "127.0.0.2"
+    port = 5001
+
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client.connect((IP, port))
+    client.send(username.encode())
+
+    # True would be replaced with a global variable like in_chat_room = True to make the thread stop at the same time
+    # as the chatroom but since it wasn't working at all there was no point in implementing this
+    while True:
+        # Both solution weren't working ...
+
+        # new_message = client.recv(1024).decode()
+        # print(new_message)
+
+        response = requests.get(BASE + "room/" + str(room_id) + "/user/" + username + "/messages", {"username": username})
+        print(response.json())
+        time.sleep(10)
+
+
 #Function to use the keyboard.press_and_release import, which presses enter. Unused atm, it was part of an unsuccessful attempt at push notifications.
 # def enter():
 #     press_and_release('enter')
@@ -55,6 +83,18 @@ in_room = False
 
 def chatroom(room_id):
     room_id = str(room_id)
+    # We didnt make this work because see def listening for explanation
+    # listening_thread = threading.Thread(target=listening(room_id))
+    # listening_thread.start()
+
+    # timed thread:
+    # timeout = 5
+    # listen_timed = threading.Timer(timeout, listening(room_id))
+    # listen_timed.start()
+    # listen_timed.cancel()
+
+    # Another solution we came up with was signal which would have been perfect to set a timer on a while loop
+    # This however only works on linux ...
 
     print(f"You are now in room {room_id}")
     print("For help, type '--help'.\nTo see new messages press enter/return without typing anything.")

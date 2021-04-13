@@ -22,6 +22,12 @@ def placeholder():
 
 
 def listening(client):
+    # We managed to make it work that the client is connecting to the server
+    # However, everytime we want to send a message the program/OS seems to close the connection
+    # We have tried to research this but we are not sure why this is happening
+    # We think it has something to do with that the API is also generating a socket
+    # which interfere with the socket of the server (even though it uses a different ip address and port)
+    # We came close but unfortunately it isn't working
     message = "A connection has been made"
     print(message)
     username = client.recv(1024).decode()
@@ -33,6 +39,7 @@ def listening(client):
     while True:
         time.sleep(15)
         hi = "hei"
+        #sending a random message to the client this will later be replaced with the messages of the room
         client.send(hi.encode())
 
 
