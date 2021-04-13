@@ -183,7 +183,7 @@ def postMessages(room_id, botname, messages):
 """Allows bots to get previously sent messages"""
 def getMessages(room_id, botname):
     room_id = str(room_id)
-    response = get_all_messages(room_id, botname, botname)
+    response = get_all_messages(room_id, botname)
     if response.status_code == 200:
         print("Messages in room " + room_id + ":")
         print(response.json())
