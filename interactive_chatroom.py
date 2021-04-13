@@ -69,7 +69,7 @@ def chatroom(room_id):
     Before sending any messages, main.py is polled for any messages that might not yet have been read. """
     while True:
         try:
-            response = requests.get(BASE + "room/" + str(room_id) + "/user/" + username + "/messages", {"username": username})
+            response = get_all_messages(room_id, username)
 
             """ Automatic polling of the server/push notification attempt (related to def enter()):
             Adding a background scheduler to press enter every 10 seconds to update the chat and see new messages.
@@ -121,12 +121,12 @@ def chatroom(room_id):
             
             elif message_input == "--showmessages":
                 """Shows all messages sent to the room where the user currently is."""
-                response = get_all_messages(room_id, username, username)
+                response = get_all_messages(room_id, username)
                 print(response.json())
 
             elif message_input == "--showmymessages":
                 """Shows messages send by user to the room where they currently are."""
-                response = get_messages(room_id, username)
+                response = get_messages(room_id, username, username)
                 print("Messages in room " + str(room_id) + " from " + username + ":")
                 print(response.json())
 
@@ -334,7 +334,7 @@ while True:
             """Shows messages from user to specified room."""
             is_join == False
             roomchoice = check_if_followed_by_argument(username, '--showmymessages', message, "You need to choose a room in order to see your messages.")
-            response = get_messages(roomchoice, username)
+            response = get_messages(roomchoice, username, username)
             if response.status_code == 200:
                 print("Messages in room " + roomchoice + " from " + username + ":")
                 print(response.json())
@@ -349,7 +349,7 @@ while True:
             """Shows all messages in specified room"""
             is_join == False
             roomchoice = check_if_followed_by_argument(username, '--showmessages', message, "You need to choose a room to check for messages.")
-            response = get_all_messages(roomchoice, username, username)
+            response = get_all_messages(roomchoice, username)
             if response.status_code == 200:
                 print("Messages in room " + roomchoice + ":")
                 print(response.json())

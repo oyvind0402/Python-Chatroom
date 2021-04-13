@@ -91,16 +91,12 @@ def abort_if_room_empty(room_id):
 
 def abort_if_roomuser_not_exists(room_id, username):
     if username not in rooms[room_id]["userlist"]:
-        abort(404, message=f"User \"{username}\" was not found in room {room_id}")
+        abort(409, message=f"User \"{username}\" was not found in room {room_id}")
 
 
 def abort_if_roomuser_exists(room_id, username):
     if username in rooms[room_id]["userlist"]:
         abort(409, message=f"User \"{username}\" is already in room {room_id}")
-
-def abort_if_roomuser_does_not_exists(room_id, username):
-    if username not in rooms[room_id]["userlist"]:
-        abort(409, message=f"User \"{username}\" is not in room {room_id}")
 
 
 def abort_if_message_list_empty(room_id):
@@ -229,7 +225,7 @@ class RoomUser(Resource):       #RoomUser = user in relation to a room
 
         abort_if_user_not_exists(username)
         abort_if_room_not_exists(room_id)
-        abort_if_roomuser_does_not_exists(room_id, username)
+        abort_if_roomuser_not_exists(room_id, username)
         rooms[room_id]["userlist"].remove(username)
         return username + " is removed from " + str(room_id), 201
 
@@ -237,25 +233,24 @@ class RoomUser(Resource):       #RoomUser = user in relation to a room
 class Message(Resource):
     """Gets messages from one or all users in a room"""
     def get(self, room_id, username=None): 
-        room_id = str(room_id) 
-        querier = message_get_args.parse_args() 
-        abort_if_querier_not_in_room(querier['username'], room_id)
-        args = message_get_args.parse_args() 
-        if username is not None: 
-            abort_if_room_not_exists(room_id) 
-            abort_if_roomuser_not_exists(room_id, username) 
-            abort_if_message_list_empty(room_id) 
-            return rooms[room_id]["message_list"], 200 
-        else: 
-            username = args["username"] 
-            abort_if_room_not_exists(room_id) 
-            abort_if_roomuser_not_exists(room_id, username) 
-            abort_if_message_list_empty(room_id) 
-            usermessages = [] 
-            for obj in rooms[room_id]["message_list"]:
-                if obj["username"] == username: 
-                    usermessages.append(obj["message"]) 
-                    return usermessages, 200
+        room_id = str(room_id)
+        querier = message_get_args.parse_args()
+        querier = querier["username"]
+
+        abort_if_querier_not_in_room(querier, room_id)
+
+        if username != None:
+            abort_if_roomuser_not_exists(room_id, username)
+            abort_if_message_list_empty(room_id)
+
+            usermsgs = []
+            for msg in rooms[room_id]["message_list"]:
+                if msg["username"] == username:
+                    usermsgs.append(msg["message"])
+            return usermsgs, 200
+        else:
+            abort_if_message_list_empty(room_id)
+            return rooms[room_id]["message_list"], 200
 
     """Adds message to room"""
     def put(self, room_id, username):

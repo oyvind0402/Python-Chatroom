@@ -55,10 +55,10 @@ def add_message(room, username, message, querier):
     response = requests.put(BASE + "room/" + str(room) + "/user/" + username + "/messages", {"username": querier, "message": message})
     return response
 
-def get_messages(room, querier):
-    response = requests.get(BASE + "room/" + str(room) + "/messages", {"username": querier}) 
+def get_messages(room, username, querier):
+    response = requests.get(BASE + "room/" + str(room) + "/user/" + username + "/messages", {"username": querier})
     return response
 
-def get_all_messages(room, username, querier):
-    response = requests.get(BASE + "room/" + str(room) + "/user/" + username + "/messages", {"username": querier})
+def get_all_messages(room, querier):
+    response = requests.get(BASE + "room/" + str(room) + "/messages", {"username": querier}) 
     return response
